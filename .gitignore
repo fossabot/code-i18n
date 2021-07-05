@@ -1,0 +1,17 @@
+.DS_Store
+node_modules
+/dist
+.vscode
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+script/j18n/output
+script/j18n/input
+script/j18n/*.json
