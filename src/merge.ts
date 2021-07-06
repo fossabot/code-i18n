@@ -4,8 +4,8 @@
  * 2，修复 parser-error.json 中指出的错误文件
  * 3，最后检查所有替换语法全部正确后执行
  */
-const path = require('path');
-const { writeLanguageZhCn } = require('./core/index');
+import path from 'path'
+import { writeLanguageZhCn } from './core/index'
 
 const currentPath = path.join(__dirname);
 const rootPath = path.join(currentPath, '../..');

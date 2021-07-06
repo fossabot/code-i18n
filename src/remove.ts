@@ -1,31 +1,36 @@
-const { readAllFile, writeLanguageZhCn } = require('./core/index');
-const path = require('path');
-const zh = require('../../locale/zh-cn.json');
+import fs from 'fs'
+import { readAllFile } from './core/index'
 
-const rootPath = path.join(__dirname, '../../');
-const v1 = path.join(rootPath, 'v1/src');
-const v2 = path.join(rootPath, 'src');
+export default function remove(path: string | string[], zh: Record<string, unknown>) {
 
-const task = Promise.all([readAllFile(v1), readAllFile(v2)]);
-task
-  .then(([p1, p2]) => {
-    return [...p1, ...p2];
-  })
-  .then(filePath => {
-    const contents = filePath.map(absolutePath => {
-      const file = require('fs').readFileSync(absolutePath, {
-        encoding: 'utf8'
+  let p: Promise<string[]>[] = []
+  if (Array.isArray(path)) {
+    p.push(...path.map(s => readAllFile(s)))
+  } else {
+    p = [readAllFile(path)]
+  }
+  const tasks = Promise.all(p);
+
+  return tasks
+    .then((args) => {
+      return [...args].flat();
+    })
+    .then(filePath => {
+      const contents = filePath.map(absolutePath => {
+        const file = fs.readFileSync(absolutePath, {
+          encoding: 'utf8'
+        });
+        return file;
       });
-      return file;
+  
+      const r: Record<string, unknown> = {};
+      Object.keys(zh).map(key => {
+        if (contents.filter(c => c.includes(key)).length) {
+          r[key] = zh[key];
+        }
+      });
+  
+      return r
     });
+}
 
-    const r = {};
-    Object.keys(zh).map(key => {
-      if (contents.filter(c => c.includes(key)).length) {
-        r[key] = zh[key];
-      }
-    });
-
-    console.log('length:', Object.keys(r).length);
-    writeLanguageZhCn({ ...r }, path.join(rootPath, 'locale/zh-cn.json'));
-  });

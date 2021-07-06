@@ -12,6 +12,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-script/j18n/output
-script/j18n/input
-script/j18n/*.json
+src/output
+src/input
+src/*.json
