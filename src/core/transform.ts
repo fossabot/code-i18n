@@ -1,4 +1,3 @@
-import { Node } from '@babel/types'
 import { cloneDeep } from 'lodash'
 import { isContainChinese } from '../utils/index'
 import traverse from '@babel/traverse'
@@ -14,7 +13,7 @@ const defaultRenderOptions: GeneratorOptions = {
 }
 
 export interface Options {
-  ruleKey?: (node: Node) => string | number
+  ruleKey?: (node: t.Node) => string | number
   readonly identifier?: string
 }
 
@@ -36,7 +35,7 @@ export default class Transform {
     this.stack = []
   }
 
-  _key(node: Node) {
+  _key(node: t.Node) {
     return this.options?.ruleKey
       ? this.options.ruleKey(node)
       : `${node.type}_${node.loc?.start.column}_${node.loc?.end.column}`
@@ -73,13 +72,27 @@ export default class Transform {
     return t.expressionStatement(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key), ...args]))
   }
 
+  _JSXTextFunction(node: t.JSXText) {
+    const key = String(this._key(node))
+    this.stack.push({
+      [key]: node.value,
+    })
+    return t.jSXExpressionContainer(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
+  }
+  
+  _JSXAttributeFunction(node: t.JSXAttribute) {
+    const key = String(this._key(node))
+    this.stack.push({
+      [key]: (node.value as t.StringLiteral).value,
+    })
+    const value = t.jSXExpressionContainer(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
+    return t.jSXAttribute(node.name, value)
+  }
+
   transform() {
     const ast = cloneDeep(this.parser.ast)
     const self = this
     traverse(ast, {
-      enter(path, state) {
-        // console.log(path, state)
-      },
       StringLiteral(path) {
         if (isContainChinese(path.node.value)) {
           path.replaceWith(self._stringFunction(path.node))
@@ -88,6 +101,17 @@ export default class Transform {
       TemplateLiteral(path) {
         if (path.node.quasis.find((quasi) => isContainChinese(quasi.value.raw))) {
           path.replaceWith(self._templateFunction(path.node))
+        }
+      },
+      JSXText(path) {
+        if (isContainChinese(path.node.value)) {
+          path.replaceWith(self._JSXTextFunction(path.node))
+        }
+      },
+      JSXAttribute(path) {
+        const { value } = path.node
+        if (t.isStringLiteral(value) && isContainChinese(value.value)) {
+          path.replaceWith(self._JSXAttributeFunction(path.node))
         }
       },
     })

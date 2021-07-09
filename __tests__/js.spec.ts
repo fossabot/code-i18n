@@ -15,11 +15,13 @@ function codeI18n(source: string, config?: Options) {
   return { code, stack }
 }
 
-describe('Parser', () => {
+type StackItem = Record<string, string>
+
+describe('JS', () => {
   test('StringLiteral [VariableDeclarator]', () => {
     const source = 'const language = "中文"'
     const { code, stack } = codeI18n(source)
-    expect(stack).toEqual(expect.arrayContaining<ArrayElement<typeof stack>>([{ StringLiteral_17_21: '中文' }]))
+    expect(stack).toEqual(expect.arrayContaining<StackItem>([{ StringLiteral_17_21: '中文' }]))
     expect(code).toBe("const language = $t('StringLiteral_17_21');")
   })
 
@@ -32,14 +34,14 @@ describe('Parser', () => {
   test('TemplateLiteral [no wrap]', () => {
     const source = 'const language = `${name}中文`'
     const { code, stack } = codeI18n(source)
-    expect(stack).toEqual(expect.arrayContaining<ArrayElement<typeof stack>>([{ TemplateLiteral_17_28: '{0}中文' }]))
+    expect(stack).toEqual(expect.arrayContaining<StackItem>([{ TemplateLiteral_17_28: '{0}中文' }]))
     expect(code).toBe("const language = $t('TemplateLiteral_17_28', name);")
   })
 
   test('TemplateLiteral [no wrap / multi-parameter]', () => {
     const source = 'const language = `${name}中文${age}`'
     const { code, stack } = codeI18n(source)
-    expect(stack).toEqual(expect.arrayContaining<ArrayElement<typeof stack>>([{ TemplateLiteral_17_34: '{0}中文{1}' }]))
+    expect(stack).toEqual(expect.arrayContaining<StackItem>([{ TemplateLiteral_17_34: '{0}中文{1}' }]))
     expect(code).toBe("const language = $t('TemplateLiteral_17_34', name, age);")
   })
 
@@ -66,7 +68,8 @@ b, null);`)
     const source = 'const language = "中文"'
     const { code } = codeI18n(source, {
       identifier: 'i18n',
+      ruleKey: (node) => `${node.type}_uuid`
     })
-    expect(code).toBe("const language = i18n('StringLiteral_17_21');")
+    expect(code).toBe("const language = i18n('StringLiteral_uuid');")
   })
 })
