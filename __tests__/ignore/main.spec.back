@@ -1,4 +1,4 @@
-import i18n from '../src/index'
+import i18n from '../../src/index'
 
 describe('Basic string replacement', () => {
   test('Replace chinese [double]', async () => {

@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { readAllFile } from './core/index'
+import { readAllFile } from '../core/index'
 
 export default function remove(path: string | string[], zh: Record<string, unknown>) {
 

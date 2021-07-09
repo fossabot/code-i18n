@@ -5,7 +5,7 @@
  * 3，最后检查所有替换语法全部正确后执行
  */
 import path from 'path'
-import { writeLanguageZhCn } from './core/index'
+import { writeLanguageZhCn } from '../core/index'
 
 const currentPath = path.join(__dirname);
 const rootPath = path.join(currentPath, '../..');

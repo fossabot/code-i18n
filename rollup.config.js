@@ -24,6 +24,7 @@ module.exports = {
     babel({
       exclude: 'node_modules/**',
       extensions,
+      runtimeHelpers: true
     }),
   ],
 }

@@ -1,4 +1,4 @@
-import i18n from '../src/index'
+import i18n from '../../src/index'
 
 describe('ES6 Template', () => {
   test('[Single]', async () => {
