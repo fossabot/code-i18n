@@ -1,5 +1,14 @@
 import { parse, ParserPlugin } from '@babel/parser'
+import { parse as vueParser, RootNode, TemplateChildNode } from '@vue/compiler-dom'
+import 'vue-eslint-parser'
 import { File } from '@babel/types'
+
+type RootNodeChildren = TemplateChildNode & {
+  tag: 'script' | 'template'
+  children: {
+    content: string
+  }[]
+}
 
 export type ParserType = 'js' | 'jsx' | 'ts' | 'tsx' | 'vue'
 
@@ -13,25 +22,44 @@ export default class Parser implements Props {
   readonly type: ParserType
   readonly ast: File
 
+  vueTemplateNode: RootNode | undefined
+
   constructor(props: Props) {
     this.content = props.content
     this.type = props.type
 
-    this.ast = this._transform()
+    let script = this.content
+    if (this.type === 'vue') {
+      this.vueTemplateNode = this._parserVue()
+      const scriptNode = (this.vueTemplateNode.children as RootNodeChildren[]).find(node => node.tag === 'script')
+      if (scriptNode) {
+        script = scriptNode.children[0].content
+      } else {
+        console.warn('TODO warn script-node null')
+      }
+    }
+
+    this.ast = this._parser(script)
   }
 
-  private _transform() {
+  private _parserVue() {
+    const ast = vueParser(this.content)
+    return ast
+  }
+
+  private _parser(script: string) {
     const Plugins: {
       [x in ParserType]: ParserPlugin[]
     } = {
       js: [],
+      vue: [],
       jsx: ['jsx'],
       ts: ['typescript'],
-      tsx: ['jsx', 'typescript'],
-      vue: [], // TODO
+      tsx: ['jsx', 'typescript']
     }
-    return parse(this.content, {
+    return parse(script, {
       plugins: Plugins[this.type],
+      sourceType: 'module'
     })
   }
 }

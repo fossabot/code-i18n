@@ -4,6 +4,7 @@ import traverse from '@babel/traverse'
 import generate, { GeneratorOptions, GeneratorResult } from '@babel/generator'
 import * as t from '@babel/types'
 import Parser from './parser'
+import VueHelpers, { VueAST } from './vue'
 
 const defaultRenderOptions: GeneratorOptions = {
   retainLines: true,
@@ -23,7 +24,7 @@ export default class Transform {
   readonly fnName: string
   readonly stack: Record<string, string>[]
 
-  public converted: t.File | undefined
+  vueHelpers: VueHelpers
 
   #identifier = '$t'
 
@@ -33,6 +34,7 @@ export default class Transform {
 
     this.fnName = this.options?.identifier || this.#identifier
     this.stack = []
+    this.vueHelpers = new VueHelpers()
   }
 
   _key(node: t.Node) {
@@ -41,7 +43,7 @@ export default class Transform {
       : `${node.type}_${node.loc?.start.column}_${node.loc?.end.column}`
   }
 
-  _stringFunction(node: t.StringLiteral) {
+  _StringFunction(node: t.StringLiteral) {
     const key = String(this._key(node))
     this.stack.push({
       [key]: node.value,
@@ -49,7 +51,7 @@ export default class Transform {
     return t.expressionStatement(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
   }
 
-  _templateFunction(node: t.TemplateLiteral) {
+  _TemplateFunction(node: t.TemplateLiteral) {
     const key = String(this._key(node))
     const args: t.Expression[] = []
 
@@ -79,7 +81,7 @@ export default class Transform {
     })
     return t.jSXExpressionContainer(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
   }
-  
+
   _JSXAttributeFunction(node: t.JSXAttribute) {
     const key = String(this._key(node))
     this.stack.push({
@@ -89,18 +91,18 @@ export default class Transform {
     return t.jSXAttribute(node.name, value)
   }
 
-  transform() {
-    const ast = cloneDeep(this.parser.ast)
+  _transform(script?: t.File) {
+    const ast = cloneDeep(script || this.parser.ast)
     const self = this
     traverse(ast, {
       StringLiteral(path) {
         if (isContainChinese(path.node.value)) {
-          path.replaceWith(self._stringFunction(path.node))
+          path.replaceWith(self._StringFunction(path.node))
         }
       },
       TemplateLiteral(path) {
         if (path.node.quasis.find((quasi) => isContainChinese(quasi.value.raw))) {
-          path.replaceWith(self._templateFunction(path.node))
+          path.replaceWith(self._TemplateFunction(path.node))
         }
       },
       JSXText(path) {
@@ -115,19 +117,27 @@ export default class Transform {
         }
       },
     })
-    this.converted = ast
-    return this
+    return ast
   }
 
-  render(options: GeneratorOptions = defaultRenderOptions): GeneratorResult {
-    if (this.converted) {
-      return generate(this.converted, options, this.parser.content)
+  transform() {
+    const { type } = this.parser
+    if (type === 'vue') {
+      return this.vueHelpers._transform(this)
     }
 
-    return this.transform().render(options)
+    return this._transform()
   }
 
-  getStack() {
-    return this.stack
+  render(options: GeneratorOptions = defaultRenderOptions): { code: string; stack: Record<string, string>[] } {
+    const { type } = this.parser
+    const ast = this.transform()
+    if (type === 'vue') {
+      return this.vueHelpers.generate(ast as VueAST)
+    }
+    return {
+      ...generate(ast as t.File, options, this.parser.content),
+      stack: this.stack,
+    }
   }
 }

@@ -9,10 +9,7 @@ function codeI18n(source: string, config?: Options) {
   })
 
   const transform = new Transform(parser, config)
-  const { code } = transform.render()
-  const stack = transform.getStack()
-
-  return { code, stack }
+  return transform.render()
 }
 
 type StackItem = Record<string, string>
@@ -44,5 +41,19 @@ describe('JSX', () => {
     const { code, stack } = codeI18n(source)
     expect(stack).toEqual(expect.arrayContaining<StackItem>([{ JSXAttribute_23_29: '中文' }]))
     expect(code).toBe("const language = <span a={$t('JSXAttribute_23_29')}></span>;")
+  })
+
+  test('JSXAttribute [JSXExpressionContainer]', () => {
+    const source = 'const language = <span a={"中文"}></span>'
+    const { code, stack } = codeI18n(source)
+    expect(stack).toEqual(expect.arrayContaining<StackItem>([{ StringLiteral_26_30: '中文' }]))
+    expect(code).toBe("const language = <span a={$t('StringLiteral_26_30')}></span>;")
+  })
+
+  test('JSXAttribute [LogicalExpression]', () => {
+    const source = 'const language = <span a={`${name || \'中文\'}`}></span>'
+    const { code, stack } = codeI18n(source)
+    expect(stack).toEqual(expect.arrayContaining<StackItem>([{ StringLiteral_37_41: '中文' }]))
+    expect(code).toBe("const language = <span a={`${name || $t('StringLiteral_37_41')}`}></span>;")
   })
 })

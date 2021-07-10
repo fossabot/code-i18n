@@ -9,10 +9,7 @@ function codeI18n(source: string, config?: Options) {
   })
 
   const transform = new Transform(parser, config)
-  const { code } = transform.render()
-  const stack = transform.getStack()
-
-  return { code, stack }
+  return transform.render()
 }
 
 type StackItem = Record<string, string>
