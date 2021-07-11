@@ -1,6 +1,7 @@
-import { TemplateChildNode, traverseNode, transform, createTransformContext, RootNode, generate } from '@vue/compiler-core'
+import { TemplateChildNode, traverseNode, transform, createTransformContext, RootNode, generateCodeFrame, createCallExpression, createSimpleExpression } from '@vue/compiler-core'
 import Transform from './transform'
 import * as t from '@babel/types'
+import { NodeTypes } from '@vue/compiler-dom'
 
 export interface VueAST {
   ast: t.File
@@ -10,11 +11,19 @@ export interface VueAST {
 export default class VueHelpers {
   constructor() {}
 
-  _generate(node: TemplateChildNode[]) {
-
+  _generate(nodes: TemplateChildNode[]) {
+    nodes.map(node => {
+      if (node.type === 1) {
+        this._generate(node.children)
+      }
+      if (node.type === 2) {
+      }
+      if (node.type === 5) {
+      }
+    })
   }
 
-  generate(vueAST: VueAST) {
+  generate(vueAST: VueAST) {   
     let content = ''
     if (vueAST.template) {
       const code = this._generate(vueAST.template.children)
@@ -30,10 +39,6 @@ export default class VueHelpers {
       transform(ast, {
         nodeTransforms: [
           (node, context) => {
-            if (node.type === 5) {
-              (node.content as {content: string}).content = '$t()'
-            }
-            // console.log(node, context)
           }
         ]
       })

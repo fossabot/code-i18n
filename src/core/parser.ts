@@ -1,6 +1,5 @@
 import { parse, ParserPlugin } from '@babel/parser'
 import { parse as vueParser, RootNode, TemplateChildNode } from '@vue/compiler-dom'
-import 'vue-eslint-parser'
 import { File } from '@babel/types'
 
 type RootNodeChildren = TemplateChildNode & {
@@ -30,6 +29,7 @@ export default class Parser implements Props {
 
     let script = this.content
     if (this.type === 'vue') {
+      console.error('NOT SOPPORT TYPE')
       this.vueTemplateNode = this._parserVue()
       const scriptNode = (this.vueTemplateNode.children as RootNodeChildren[]).find(node => node.tag === 'script')
       if (scriptNode) {
