@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var parser = require('@babel/parser');
+var parser$1 = require('@babel/parser');
 var lodash = require('lodash');
 var traverse = require('@babel/traverse');
 var generate = require('@babel/generator');
@@ -1693,7 +1693,7 @@ function createTransformContext(root, { filename = '', prefixIdentifiers = false
     }
     return context;
 }
-function transform(root, options) {
+function transform$1(root, options) {
     const context = createTransformContext(root, options);
     traverseNode(root, context);
     if (options.hoistStatic) {
@@ -2071,7 +2071,7 @@ var Parser = /*#__PURE__*/function () {
         ts: ['typescript'],
         tsx: ['jsx', 'typescript']
       };
-      return parser.parse(script, {
+      return parser$1.parse(script, {
         plugins: Plugins[this.type],
         sourceType: 'module'
       });
@@ -2080,6 +2080,11 @@ var Parser = /*#__PURE__*/function () {
 
   return Parser;
 }();
+
+var parser = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  'default': Parser
+});
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -2138,7 +2143,7 @@ var VueHelpers = /*#__PURE__*/function () {
     key: "traverse",
     value: function traverse(ast) {
       if (ast) {
-        transform(ast, {
+        transform$1(ast, {
           nodeTransforms: [function (node, context) {}]
         });
       }
@@ -2306,6 +2311,11 @@ var Transform = /*#__PURE__*/function () {
   return Transform;
 }();
 
+var transform = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  'default': Transform
+});
+
 function transformCode(code, config) {
   var parser = new Parser({
     content: code,
@@ -2315,4 +2325,6 @@ function transformCode(code, config) {
   return transform.render();
 }
 
+exports.Parser = parser;
+exports.Transform = transform;
 exports.transformCode = transformCode;

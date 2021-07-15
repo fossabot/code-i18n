@@ -1,6 +1,6 @@
 {
   "name": "code-i18n",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Intrusive language conversion script",
   "main": "index.js",
   "types": "types/index.d.ts",
@@ -13,6 +13,18 @@
   ],
   "author": "Link",
   "license": "MIT",
+  "files": [
+    "__tests__",
+    "src",
+    "types"
+  ],
+  "bugs": {
+    "url": "https://github.com/Linkontoask/code-i18n/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Linkontoask/code-i18n.git"
+  },
   "dependencies": {
     "@types/lodash": "^4.14.171",
     "lodash": "^4.17.21",
