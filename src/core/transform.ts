@@ -26,13 +26,13 @@ export default class Transform {
 
   vueHelpers: VueHelpers
 
-  #identifier = '$t'
+  readonly identifier = '$t'
 
   constructor(parser: Parser, options?: Options) {
     this.parser = parser
     this.options = options
 
-    this.fnName = this.options?.identifier || this.#identifier
+    this.fnName = this.options?.identifier || this.identifier
     this.stack = []
     this.vueHelpers = new VueHelpers()
   }

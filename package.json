@@ -2,7 +2,8 @@
   "name": "code-i18n",
   "version": "1.0.0",
   "description": "Intrusive language conversion script",
-  "main": "lib/index.js",
+  "main": "index.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "test": "jest",
     "build": "rollup -c"
