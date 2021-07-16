@@ -15,7 +15,7 @@ module.exports = {
     format: 'cjs',
     exports: 'auto'
   },
-  external: ['prettier', 'glob'],
+  external: ['prettier', '@vue/compiler-dom', '@vue/compiler-core'],
   plugins: [
     nodeResolve({
       extensions,
