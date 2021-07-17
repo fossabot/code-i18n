@@ -1,17 +1,41 @@
 const { defineComponent, ref, onMounted } = Vue
-// import ace from 'ace-builds'
 
 export const Editor = defineComponent({
-  name: '$404',
-  template: '<div class="editor" ref="editor"></div>',
-  setup() {
+  name: 'Editor',
+  template: `<div class="editor-container">
+    <div class="editor" ref="editor"></div>
+    <div class="editor-placeholder">在这里粘贴或输入你的代码</div>
+  </div>`,
+  emits: ['update:value'],
+  props: {
+    value: String
+  },
+  setup(props, { emit }) {
     const editor = ref(null)
+
+    const value = window.localStorage.getItem('source') || ''
+    emit('update:value', value)
+
+    const update = (editors) => {
+      const val = editors.getSession().getValue()
+      window.localStorage.setItem('source', val)
+      emit('update:value', val)
+    }
 
     onMounted(() => {
       const editors = ace.edit(editor.value)
-      console.log(editors)
-      // editor.setTheme('ace/theme/twilight')
-      editors.session.setMode(Mode)
+      const value = window.localStorage.getItem('source') || ''
+      editors.setValue(value)
+      editors.setOptions({
+        fontSize: "16px",
+        tabSize: 2
+      });
+      editors.setTheme('ace/theme/chrome')
+      editors.session.setMode('ace/mode/jsx')
+
+      editors.getSession().on('change', function() {
+        update(editors)
+      });
     })
 
     return {

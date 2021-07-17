@@ -15,7 +15,7 @@ module.exports = {
     format: 'cjs',
     exports: 'auto'
   },
-  external: ['prettier', '@vue/compiler-dom', '@vue/compiler-core'],
+  external: ['lodash', 'prettier', '@vue/compiler-dom', '@vue/compiler-core'],
   plugins: [
     nodeResolve({
       extensions,
