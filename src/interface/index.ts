@@ -1,5 +1,5 @@
 import * as t from '@babel/types'
-import { Node } from 'vue-eslint-parser/ast/nodes'
+import { Node } from 'vue-eslint-parser-private/ast/nodes'
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType

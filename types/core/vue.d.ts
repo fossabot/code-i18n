@@ -1,17 +1,25 @@
-import { TemplateChildNode, RootNode } from '@vue/compiler-core';
-import Transform from './transform';
-import * as t from '@babel/types';
-export interface VueAST {
-    ast: t.File;
-    template?: RootNode;
-}
+import { Node, ESLintProgram, VText, VLiteral, ESLintLiteral } from 'vue-eslint-parser-private/ast/nodes';
+import { ESLintTemplateLiteral } from 'vue-eslint-parser-private/ast';
+import { Options } from '../interface';
+import Parser from './parser';
 export default class VueHelpers {
-    constructor();
-    _generate(nodes: TemplateChildNode[]): void;
-    generate(vueAST: VueAST): {
+    private map;
+    readonly parser: Parser;
+    readonly options: Options | undefined;
+    private stack;
+    private content;
+    constructor(parser: Parser, options?: Options);
+    _renderKey(ast: Node): string | number;
+    _generate(): {
         code: string;
-        stack: any[];
+        stack: Record<string, string>[];
     };
-    traverse(ast: RootNode | undefined): RootNode;
-    _transform(transform: Transform): VueAST;
+    _traverseTemplateBody(ast: VText | VLiteral | ESLintLiteral): void;
+    _traverseTemplateLiteral(ast: ESLintTemplateLiteral): void;
+    _traverse(ast: ESLintProgram, keys: string[]): void;
+    _transform(): void;
+    generate(): {
+        code: string;
+        stack: Record<string, string>[];
+    };
 }

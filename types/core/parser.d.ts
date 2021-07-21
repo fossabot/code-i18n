@@ -1,5 +1,5 @@
-import { RootNode } from '@vue/compiler-dom';
 import { File } from '@babel/types';
+import { ESLintProgram } from 'vue-eslint-parser-private/ast';
 export declare type ParserType = 'js' | 'jsx' | 'ts' | 'tsx' | 'vue';
 export interface Props {
     content: string;
@@ -8,9 +8,7 @@ export interface Props {
 export default class Parser implements Props {
     readonly content: string;
     readonly type: ParserType;
-    readonly ast: File;
-    vueTemplateNode: RootNode | undefined;
+    readonly ast: File | ESLintProgram;
     constructor(props: Props);
-    private _parserVue;
     private _parser;
 }

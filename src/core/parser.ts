@@ -30,16 +30,16 @@ export default class Parser implements Props {
       vue: [],
       jsx: ['jsx'],
       ts: ['typescript'],
-      tsx: ['jsx', 'typescript']
+      tsx: ['jsx', 'typescript'],
     }
     if (this.type === 'vue') {
       return parseForESLint(script, {
-        sourceType: 'module'
+        sourceType: 'module',
       })
     }
     return parse(script, {
+      sourceType: 'module',
       plugins: Plugins[this.type],
-      sourceType: 'module'
     })
   }
 }

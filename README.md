@@ -23,7 +23,7 @@ Languages currently supported for conversion
 | jsx  | <li> - [x] </li> |
 |  ts  | <li> - [x] </li> |
 | tsx  | <li> - [x] </li> |
-| vue  | <li> - [ ] </li> |
+| vue  | <li> - [x] </li> |
 
 ## Usage
 
@@ -70,4 +70,18 @@ export declare function transformCode(
 
 ## Tests
 
-`yarn test`
+Run `yarn test` to test.
+
+Current test coverage table
+
+---------------|---------|----------|---------|---------|-------------------
+File           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+---------------|---------|----------|---------|---------|-------------------
+All files      |     100 |    90.57 |     100 |     100 |                   
+ core          |     100 |    90.57 |     100 |     100 |                   
+  parser.ts    |     100 |      100 |     100 |     100 |                   
+  transform.ts |     100 |     91.3 |     100 |     100 | 68,107            
+  vue.ts       |     100 |    89.29 |     100 |     100 | 38,147,170        
+ utils         |     100 |      100 |     100 |     100 |                   
+  index.ts     |     100 |      100 |     100 |     100 |                   
+---------------|---------|----------|---------|---------|-------------------

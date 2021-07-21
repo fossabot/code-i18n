@@ -3,7 +3,6 @@ import { ESLintTemplateLiteral } from 'vue-eslint-parser-private/ast'
 import { traverseNodes, parse } from 'vue-eslint-parser-private'
 import { isContainChinese } from '../utils/index'
 import { Options } from '../interface'
-import { createPatch, applyPatch, applyPatches, parsePatch, ParsedDiff } from 'diff'
 import Parser from './parser'
 
 export default class VueHelpers {
@@ -20,6 +19,8 @@ export default class VueHelpers {
   >
   readonly parser: Parser
   readonly options: Options | undefined
+  readonly identifier = '$t'
+  readonly fnName: string
   private stack: Record<string, string>[]
   private content: string
 
@@ -29,6 +30,7 @@ export default class VueHelpers {
     this.parser = parser
     this.stack = []
     this.content = this.parser.content
+    this.fnName = this.options?.identifier || this.identifier
   }
 
   _renderKey(ast: Node) {
@@ -94,7 +96,7 @@ export default class VueHelpers {
     const key = this._renderKey(ast)
 
     if (ast.type === 'VText') {
-      const v = `{{$t('${key}')}}`
+      const v = `{{${this.fnName}('${key}')}}`
       this.map.set(
         {
           type: 'VText',
@@ -110,7 +112,7 @@ export default class VueHelpers {
     if (ast.type === 'VLiteral') {
       const rawkey = ast.parent.key.rawName
       const source = this.parser.content.slice(ast.parent.range[0], ast.parent.range[1])
-      const v = `:${rawkey}="$t('${key}')"`
+      const v = `:${rawkey}="${this.fnName}('${key}')"`
       this.map.set(
         {
           type: 'VLiteral',
@@ -126,7 +128,7 @@ export default class VueHelpers {
 
     if (ast.type === 'Literal') {
       const source = (ast as unknown as { raw: string }).raw
-      const v = `$t('${key}')`
+      const v = `${this.fnName}('${key}')`
       this.map.set(
         {
           type: 'Literal',
@@ -165,7 +167,7 @@ export default class VueHelpers {
         language = language.replace(regexp, `{${i++}}`)
       })
 
-      const v = `$t('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
+      const v = `${this.fnName}('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
       this.map.set(
         {
           type: 'TemplateLiteral',
@@ -206,7 +208,6 @@ export default class VueHelpers {
 
   generate() {
     this._transform()
-    const r = this._generate()
-    return r
+    return this._generate()
   }
 }

@@ -1,5 +1,6 @@
 import Parser, { ParserType } from './core/parser'
-import Transform, { Options } from './core/transform'
+import Transform from './core/transform'
+import { Options } from '../src/interface/index'
 
 export * as Parser from './core/parser'
 export * as Transform from './core/transform'

@@ -13,9 +13,16 @@ module.exports = {
   output: {
     file: 'index.js',
     format: 'cjs',
-    exports: 'auto'
+    exports: 'auto',
   },
-  external: ['lodash', 'prettier', '@vue/compiler-dom', '@vue/compiler-core'],
+  external: [
+    'lodash',
+    'vue-eslint-parser-private',
+    '@babel/traverse',
+    '@babel/generator',
+    '@babel/types',
+    '@babel/parser',
+  ],
   plugins: [
     nodeResolve({
       extensions,
@@ -24,7 +31,7 @@ module.exports = {
     babel({
       exclude: 'node_modules/**',
       extensions,
-      runtimeHelpers: true
+      runtimeHelpers: true,
     }),
   ],
 }
