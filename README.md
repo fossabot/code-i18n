@@ -67,6 +67,12 @@ export declare function transformCode(
 + TemplateLiteral
 + JSXText
 + JSXAttribute
++ Vue
+  + Literal
+  + VText
+  + VAttribute
+  + VLiteral
+  + TemplateLiteral
 
 ## Tests
 
