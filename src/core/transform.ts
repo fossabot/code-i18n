@@ -1,10 +1,11 @@
 import { cloneDeep } from 'lodash'
 import { isContainChinese } from '../utils/index'
-import traverse from '@babel/traverse'
 import generate, { GeneratorOptions, GeneratorResult } from '@babel/generator'
+import traverse from '@babel/traverse'
+import { Options } from '../interface'
+import VueHelpers from './vue'
 import * as t from '@babel/types'
 import Parser from './parser'
-import VueHelpers, { VueAST } from './vue'
 
 const defaultRenderOptions: GeneratorOptions = {
   retainLines: true,
@@ -13,20 +14,15 @@ const defaultRenderOptions: GeneratorOptions = {
   },
 }
 
-export interface Options {
-  ruleKey?: (node: t.Node) => string | number
-  readonly identifier?: string
-}
-
 export default class Transform {
   readonly parser: Parser
   readonly options: Options | undefined
   readonly fnName: string
   readonly stack: Record<string, string>[]
 
-  vueHelpers: VueHelpers
-
   readonly identifier = '$t'
+  
+  VueHelpers: VueHelpers
 
   constructor(parser: Parser, options?: Options) {
     this.parser = parser
@@ -34,13 +30,15 @@ export default class Transform {
 
     this.fnName = this.options?.identifier || this.identifier
     this.stack = []
-    this.vueHelpers = new VueHelpers()
+
+    this.VueHelpers = new VueHelpers(parser, options)
   }
 
   _key(node: t.Node) {
+    const loc = node.loc as t.SourceLocation
     return this.options?.ruleKey
       ? this.options.ruleKey(node)
-      : `${node.type}_${node.loc?.start.column}_${node.loc?.end.column}`
+      : `${node.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
   }
 
   _StringFunction(node: t.StringLiteral) {
@@ -91,8 +89,8 @@ export default class Transform {
     return t.jSXAttribute(node.name, value)
   }
 
-  _transform(script?: t.File) {
-    const ast = cloneDeep(script || this.parser.ast)
+  _transform() {
+    const ast = cloneDeep(this.parser.ast) as t.File
     const self = this
     traverse(ast, {
       StringLiteral(path) {
@@ -121,19 +119,15 @@ export default class Transform {
   }
 
   transform() {
-    const { type } = this.parser
-    if (type === 'vue') {
-      return this.vueHelpers._transform(this)
+    if (t.isFile(this.parser.ast)) {
+      return this._transform()
     }
-
-    return this._transform()
   }
 
   render(options: GeneratorOptions = defaultRenderOptions): { code: string; stack: Record<string, string>[] } {
-    const { type } = this.parser
     const ast = this.transform()
-    if (type === 'vue') {
-      return this.vueHelpers.generate(ast as VueAST)
+    if (!t.isFile(this.parser.ast)) {
+      return this.VueHelpers.generate()
     }
     return {
       ...generate(ast as t.File, options, this.parser.content),

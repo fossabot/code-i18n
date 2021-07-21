@@ -1,66 +1,212 @@
-import { TemplateChildNode, traverseNode, transform, createTransformContext, RootNode, generateCodeFrame, createCallExpression, createSimpleExpression } from '@vue/compiler-core'
-import Transform from './transform'
-import * as t from '@babel/types'
-import { NodeTypes } from '@vue/compiler-dom'
-
-export interface VueAST {
-  ast: t.File
-  template?: RootNode
-}
+import { Node, ESLintProgram, VText, VLiteral, ESLintLiteral } from 'vue-eslint-parser-private/ast/nodes'
+import { ESLintTemplateLiteral } from 'vue-eslint-parser-private/ast'
+import { traverseNodes, parse } from 'vue-eslint-parser-private'
+import { isContainChinese } from '../utils/index'
+import { Options } from '../interface'
+import { createPatch, applyPatch, applyPatches, parsePatch, ParsedDiff } from 'diff'
+import Parser from './parser'
 
 export default class VueHelpers {
-  constructor() {}
+  private map: Map<
+    {
+      type: string
+      source: string
+      range: [number, number]
+      key: string | number
+      language: string
+      length: number
+    },
+    string
+  >
+  readonly parser: Parser
+  readonly options: Options | undefined
+  private stack: Record<string, string>[]
+  private content: string
 
-  _generate(nodes: TemplateChildNode[]) {
-    nodes.map(node => {
-      if (node.type === 1) {
-        this._generate(node.children)
+  constructor(parser: Parser, options?: Options) {
+    this.map = new Map()
+    this.options = options
+    this.parser = parser
+    this.stack = []
+    this.content = this.parser.content
+  }
+
+  _renderKey(ast: Node) {
+    const loc = ast.loc
+    return this.options?.ruleKey
+      ? this.options.ruleKey(ast)
+      : `${ast.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
+  }
+
+  _generate() {
+    const stack: Record<string, string>[] = []
+    const map = [...this.map.entries()]
+
+    let code = this.content
+
+    for (const [k, v] of map) {
+      code = code.slice(0, k.range[0]) + v + code.slice(k.range[1])
+      stack.push({
+        [k.key]: k.language,
+      })
+      // recalculate
+      for (let i = 0; i < map.length; i++) {
+        const [k1] = map[i]
+        if (k1.range[0] > k.range[1]) {
+          const diff = k.length - k.source.length
+          const range: [number, number] = [k1.range[0] + diff, k1.range[1] + diff]
+          map[i][0] = {
+            ...map[i][0],
+            range: range,
+          }
+        }
+        if (k1.range[0] > k.range[0] && k1.range[1] < k.range[1]) {
+          // contain
+          const diff = code.indexOf(k1.source)
+          const range: [number, number] = [diff, diff + k1.source.length]
+          map[i][0] = {
+            ...map[i][0],
+            range: range,
+          }
+        }
       }
-      if (node.type === 2) {
-      }
-      if (node.type === 5) {
-      }
+    }
+
+    // clear map
+    this.map = new Map()
+
+    // keep stack
+    this.stack.push(...stack)
+
+    this.content = code
+
+    return {
+      code: code,
+      stack: this.stack,
+    }
+  }
+
+  _traverseTemplateBody(ast: VText | VLiteral | ESLintLiteral) {
+    if (!isContainChinese(ast.value as string)) {
+      return
+    }
+
+    const key = this._renderKey(ast)
+
+    if (ast.type === 'VText') {
+      const v = `{{$t('${key}')}}`
+      this.map.set(
+        {
+          type: 'VText',
+          source: ast.value,
+          range: ast.range,
+          key: key,
+          language: ast.value,
+          length: v.length,
+        },
+        v
+      )
+    }
+    if (ast.type === 'VLiteral') {
+      const rawkey = ast.parent.key.rawName
+      const source = this.parser.content.slice(ast.parent.range[0], ast.parent.range[1])
+      const v = `:${rawkey}="$t('${key}')"`
+      this.map.set(
+        {
+          type: 'VLiteral',
+          source: source,
+          range: ast.parent.range,
+          key: key,
+          language: ast.value,
+          length: v.length,
+        },
+        v
+      )
+    }
+
+    if (ast.type === 'Literal') {
+      const source = (ast as unknown as { raw: string }).raw
+      const v = `$t('${key}')`
+      this.map.set(
+        {
+          type: 'Literal',
+          source: source,
+          range: ast.range,
+          key: key,
+          language: source.slice(1, -1),
+          length: v.length,
+        },
+        v
+      )
+    }
+  }
+
+  _traverseTemplateLiteral(ast: ESLintTemplateLiteral) {
+    if (ast.quasis.find((quasi) => isContainChinese(quasi.value.raw))) {
+      const key = this._renderKey(ast)
+      const content = this.content
+
+      const source = content.slice(ast.start, ast.end)
+
+      const args = ast.expressions.map((expression) => {
+        return content.slice(expression.start, expression.end)
+      })
+
+      let language = source,
+        i = 0
+      args.map((arg) => {
+        const regexp = new RegExp(
+          `\\$\\{.{0,}${arg
+            .split('')
+            .map((item) => (/[\da-zA-Z]/.test(item) ? item : '\\' + item))
+            .join('')
+            .slice(2)}.{0,}\\}`
+        )
+        language = language.replace(regexp, `{${i++}}`)
+      })
+
+      const v = `$t('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
+      this.map.set(
+        {
+          type: 'TemplateLiteral',
+          source: source,
+          range: ast.range,
+          key: key,
+          language: language.slice(1, -1),
+          length: v.length,
+        },
+        v
+      )
+    }
+  }
+
+  _traverse(ast: ESLintProgram, keys: string[]) {
+    const self = this
+    traverseNodes(ast, {
+      visitorKeys: keys,
+      enterNode(node, parent) {
+        if (keys.includes(node.type) && node.type === 'TemplateLiteral') {
+          self._traverseTemplateLiteral(node as any)
+        } else {
+          self._traverseTemplateBody(node as any)
+        }
+      },
+      leaveNode(node, parent) {},
     })
   }
 
-  generate(vueAST: VueAST) {   
-    let content = ''
-    if (vueAST.template) {
-      const code = this._generate(vueAST.template.children)
-    }
-    return {
-      code: content,
-      stack: [],
-    }
+  _transform() {
+    this._traverse(this.parser.ast as ESLintProgram, ['Literal', 'VText', 'VAttribute', 'VLiteral'])
+    const { code } = this._generate()
+    const ast = parse(code, {
+      sourceType: 'module',
+    })
+    this._traverse(ast, ['TemplateLiteral'])
   }
 
-  traverse(ast: RootNode | undefined) {
-    if (ast) {
-      transform(ast, {
-        nodeTransforms: [
-          (node, context) => {
-          }
-        ]
-      })
-    }
-    return ast
-  }
-
-  _transform(transform: Transform): VueAST {
-    const {
-      parser: { ast, vueTemplateNode },
-      _transform,
-    } = transform
-
-    // transform script
-    const asted = _transform.call(transform, ast)
-
-    // transform template
-    const template = this.traverse(vueTemplateNode)
-
-    return {
-      ast: asted,
-      template,
-    }
+  generate() {
+    this._transform()
+    const r = this._generate()
+    return r
   }
 }
