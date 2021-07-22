@@ -63,6 +63,7 @@ var Parser = /*#__PURE__*/function () {
 
     this.content = props.content;
     this.type = props.type;
+    this.plugins = props.plugins || [];
     this.ast = this._parser(this.content);
   }
 
@@ -85,7 +86,7 @@ var Parser = /*#__PURE__*/function () {
 
       return parser$1.parse(script, {
         sourceType: 'module',
-        plugins: Plugins[this.type]
+        plugins: Plugins[this.type].concat(this.plugins)
       });
     }
   }]);
@@ -560,7 +561,8 @@ var transform = /*#__PURE__*/Object.freeze({
 function transformCode(code, config) {
   var parser = new Parser({
     content: code,
-    type: config.type
+    type: config.type,
+    plugins: config.plugins
   });
   var transform = new Transform(parser, config);
   return transform.render();

@@ -8,16 +8,19 @@ export type ParserType = 'js' | 'jsx' | 'ts' | 'tsx' | 'vue'
 export interface Props {
   content: string
   type: ParserType
+  plugins?: ParserPlugin[]
 }
 
 export default class Parser implements Props {
   readonly content: string
   readonly type: ParserType
   readonly ast: File | ESLintProgram
+  readonly plugins: ParserPlugin[]
 
   constructor(props: Props) {
     this.content = props.content
     this.type = props.type
+    this.plugins = props.plugins || []
 
     this.ast = this._parser(this.content)
   }
@@ -39,7 +42,7 @@ export default class Parser implements Props {
     }
     return parse(script, {
       sourceType: 'module',
-      plugins: Plugins[this.type],
+      plugins: Plugins[this.type].concat(this.plugins),
     })
   }
 }

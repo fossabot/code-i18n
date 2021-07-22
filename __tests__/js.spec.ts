@@ -5,6 +5,7 @@ import { Options } from '../src/interface/index'
 function codeI18n(source: string, config?: Options) {
   const parser = new Parser({
     content: source,
+    plugins: [['decorators', {decoratorsBeforeExport: true}]],
     type: 'js',
   })
 

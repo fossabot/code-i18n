@@ -15,3 +15,5 @@ yarn-error.log*
 src/output
 src/input
 src/*.json
+
+coverage

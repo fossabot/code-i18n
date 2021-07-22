@@ -6,6 +6,8 @@ export default class VueHelpers {
     private map;
     readonly parser: Parser;
     readonly options: Options | undefined;
+    readonly identifier = "$t";
+    readonly fnName: string;
     private stack;
     private content;
     constructor(parser: Parser, options?: Options);
