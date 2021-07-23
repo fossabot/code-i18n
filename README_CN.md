@@ -1,7 +1,5 @@
 # code-i18n
 
-[中文](./README_CN.md) English is with `google tranlate` automatic translation
-
 - [What is this?](#what-is-this)
 - [Type](#type)
 - [Usage](#usage)
@@ -12,12 +10,12 @@
 
 ## What is this?
 
-`code-i18n` is a script that converts Chinese in the code into executable functions
+`code-i18n` 是将代码中的中文转换为可执行函数的脚本
 [![Netlify Status](https://api.netlify.com/api/v1/badges/644b446a-84ff-45cd-8267-c6b501b04114/deploy-status)](https://app.netlify.com/sites/code-i18n/deploys)
 
 ## Type
 
-Languages currently supported for conversion
+目前支持转换的语言
 
 | Type |     Support      |
 | :--: | :--------------: |
@@ -29,7 +27,7 @@ Languages currently supported for conversion
 
 ## Usage
 
-`code-i18n` exports a convenience function, the parameters are `source` and `config`, the return value is an object, please see [Documentation](#documentation) for details.
+`code-i18n` 导出一个很简单的函数，参数是 `source` 和 `config` ，返回值是一个对象，详见 [文档](#documentation)。
 
 ```javascript
 import { transformCode } from 'code-i18n'
@@ -42,7 +40,7 @@ console.log(code) // const language = $t('StringLiteral_17_21');
 console.log(stack) // [ { StringLiteral_17_21: "中文" } ]
 ```
 
-If a parsing error occurs, it may be due to the use of unconventional syntax, such as spread syntax `[Spread syntax]` (supported by default), decorator `[Decorator]`, don't worry, you can adapt the code according to the following configuration.
+如果发生解析错误，或许是因为使用了非常规语法，比如 展开语法 `[Spread syntax]`（默认支持）、修饰器 `[Decorator]`，不用担心，你可以按照如下配置对代码进行适配。
 
 ```javascript
 transformCode(source, {
@@ -61,7 +59,7 @@ transformCode(source, {
 
 ### Documentation
 
-The following uses typescript to introduce how to use `code-i18n`. Some of these documents need to refer to these places [vue-eslint-parser](https://github.com/vuejs/vue-eslint-parser), [babel-parser](https://babeljs.io/docs/en/ babel-parser), [espree](https://github.com/eslint/espree)
+下面使用 typescript 的形式介绍 `code-i18n` 使用方法。其中有些文档需要参考这些地方 [vue-eslint-parser](https://github.com/vuejs/vue-eslint-parser)、[babel-parser](https://babeljs.io/docs/en/babel-parser)、[espree](https://github.com/eslint/espree)
 
 ```typescript
 import { ParserOptions as BabelParserOptions } from '@babel/parser'
@@ -88,7 +86,7 @@ export declare function transformCode(
 }
 ```
 
-Now, `parserOptions` already has a default value. Check whether the default value meets expectations when you have any syntax errors. For example, when you find an error in `optional expression` (optional chain), you need to configure the following information. These problems usually occur when parsing `vue` files.
+现在，`parserOptions` 已经存在默认值，当你发生有任何语法错误的时候检查此默认值是否符合预期。比如当你发现有 `optional expression`（可选链） 错误的时候，你需要配置如下信息。通常在解析 `vue` 文件的时候才会出现这些问题。
 
 ```javascript
 transformCode(source, {
@@ -100,7 +98,7 @@ transformCode(source, {
 })
 ```
 
-Sometimes we need to use the syntax of `jsx` when writing `vue` code, now you have to change the vue attribute of `parserOptions`.
+有的时候我们在编写 `vue` 代码的时候需要使用 `jsx` 的语法，现在你必须将 `parserOptions` 的 vue 属性进行更改。
 
 ```javascript
 transformCode(source, {
@@ -114,7 +112,7 @@ transformCode(source, {
 })
 ```
 
-Well, having said so much, here are the default values of `parserOptions`.
+好了，说了这么多，下面就是 `parserOptions` 的默认值。
 
 ```javascript
 const DEFAULT_PARSER_OPTIONS = {
@@ -134,11 +132,11 @@ const DEFAULT_PARSER_OPTIONS = {
 
 ## Example
 
-Here is a piece of code to introduce the project usage of `code-i18n`. Usually in the process of writing code, you need to always pay attention to the hard coding of the text, because this will make the product lose users of different languages. I have found some open source projects in the market. They use the ability of webpack to add irreversible conversion codes to the final product during the build period. This is very unfriendly and it is difficult to identify errors when they occur.
+这里使用一段代码来介绍 `code-i18n` 的项目用法。通常在写代码的过程中，需要时刻注意文本的硬编码，因为这会让产品失去不同语言的用户。市场上我发现了一些开源项目，他们通过 webpack 的能力，在 `build` 期间，向最终产物添加不可逆的转换代码，这很不友好，并且在发生错误的同时很难去甄别。
 
-`code-i18n` is to replace the string in the source code with an executable function, you can read the source code of the language part while developing, and can internationalize the released product. This is all thanks to the growing open source community, and I would like to thank the `babel` and `eslint` organizations here.
+`code-i18n` 是将源码中的字符串替换成可执行函数，在开发的同时即可阅读语言部分的源码，并且可以将已经发布的产品国际化处理。这都得益于日趋强大的开源社区，在这里感谢 `babel` 和 `eslint` 组织。
 
-The following is a function to help us convert all Chinese characters in the project into `$t('xxxx')`, if an error occurs, the corresponding file path and error log will be printed
+下面是帮助我们将项目中所有中文字符转换成 `$t('xxxx')` 的函数，如果发生错误将打印对应的文件路径和错误日志
 
 ```javascript
 const glob = require('glob')
@@ -202,9 +200,9 @@ glob(
 
 ## Tests
 
-Run `yarn test` to test.
+运行 `yarn test` 进行测试。
 
-Current test coverage table
+当前测试覆盖率表。
 
 | File         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s |
 | ------------ | ------- | -------- | ------- | ------- | ----------------- |

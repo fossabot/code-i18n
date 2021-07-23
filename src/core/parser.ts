@@ -3,6 +3,7 @@ import { parse as parseForESLint } from 'vue-eslint-parser-private'
 import { File } from '@babel/types'
 import { ESLintProgram } from 'vue-eslint-parser-private/ast'
 import { Linter } from 'eslint'
+import { merge } from 'lodash'
 
 export type ParserType = 'js' | 'jsx' | 'ts' | 'tsx' | 'vue'
 
@@ -35,9 +36,10 @@ export default class Parser implements Props {
 
   constructor(props: Props) {
     const DEFAULT_PARSER_OPTIONS: Required<ParserOptions> = {
+      // https://github.com/eslint/espree#options
       vue: {
         sourceType: 'module',
-        ecmaVersion: 2018,
+        ecmaVersion: 11,
         ecmaFeatures: {
           experimentalObjectRestSpread: true,
         },
@@ -46,7 +48,7 @@ export default class Parser implements Props {
         sourceType: 'module',
       },
     }
-    this.parserOptions = Object.assign(DEFAULT_PARSER_OPTIONS, props.parserOptions)
+    this.parserOptions = merge(DEFAULT_PARSER_OPTIONS, props.parserOptions)
     this.content = props.content
     this.type = props.type
 

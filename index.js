@@ -72,7 +72,7 @@ var Parser = /*#__PURE__*/function () {
     var DEFAULT_PARSER_OPTIONS = {
       vue: {
         sourceType: 'module',
-        ecmaVersion: 2018,
+        ecmaVersion: 2020,
         ecmaFeatures: {
           experimentalObjectRestSpread: true
         }
@@ -81,7 +81,7 @@ var Parser = /*#__PURE__*/function () {
         sourceType: 'module'
       }
     };
-    this.parserOptions = Object.assign(DEFAULT_PARSER_OPTIONS, props.parserOptions);
+    this.parserOptions = lodash.merge(DEFAULT_PARSER_OPTIONS, props.parserOptions);
     this.content = props.content;
     this.type = props.type;
     this.ast = this._parser();
