@@ -55,7 +55,13 @@ transformCode(source, {
 
 ### Installation
 
-`yarn add -D code-i18n`
+```shell
+yarn add -D code-i18n
+```
+
+```shell
+npm install --save-dev code-i18n
+```
 
 ### Documentation
 

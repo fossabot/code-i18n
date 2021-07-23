@@ -57,11 +57,17 @@ transformCode(source, {
 
 ### Installation
 
-`yarn add -D code-i18n`
+```shell
+yarn add -D code-i18n
+```
+
+```shell
+npm install --save-dev code-i18n
+```
 
 ### Documentation
 
-The following uses typescript to introduce how to use `code-i18n`. Some of these documents need to refer to these places [vue-eslint-parser](https://github.com/vuejs/vue-eslint-parser), [babel-parser](https://babeljs.io/docs/en/ babel-parser), [espree](https://github.com/eslint/espree)
+The following uses typescript to introduce how to use `code-i18n`. Some of these documents need to refer to these places [vue-eslint-parser](https://github.com/vuejs/vue-eslint-parser), [babel-parser](https://babeljs.io/docs/en/babel-parser), [espree](https://github.com/eslint/espree)
 
 ```typescript
 import { ParserOptions as BabelParserOptions } from '@babel/parser'
