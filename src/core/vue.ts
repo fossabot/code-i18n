@@ -200,9 +200,7 @@ export default class VueHelpers {
   _transform() {
     this._traverse(this.parser.ast as ESLintProgram, ['Literal', 'VText', 'VAttribute', 'VLiteral'])
     const { code } = this._generate()
-    const ast = parse(code, {
-      sourceType: 'module',
-    })
+    const ast = parse(code, this.parser.parserOptions.vue)
     this._traverse(ast, ['TemplateLiteral'])
   }
 

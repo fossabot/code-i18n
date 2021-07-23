@@ -57,37 +57,46 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 
+var Plugins = {
+  js: [],
+  vue: [],
+  jsx: ['jsx'],
+  ts: ['typescript'],
+  tsx: ['jsx', 'typescript']
+};
+
 var Parser = /*#__PURE__*/function () {
   function Parser(props) {
     _classCallCheck(this, Parser);
 
+    var DEFAULT_PARSER_OPTIONS = {
+      vue: {
+        sourceType: 'module',
+        ecmaVersion: 2018,
+        ecmaFeatures: {
+          experimentalObjectRestSpread: true
+        }
+      },
+      babel: {
+        sourceType: 'module'
+      }
+    };
+    this.parserOptions = Object.assign(DEFAULT_PARSER_OPTIONS, props.parserOptions);
     this.content = props.content;
     this.type = props.type;
-    this.plugins = props.plugins || [];
-    this.ast = this._parser(this.content);
+    this.ast = this._parser();
   }
 
   _createClass(Parser, [{
     key: "_parser",
-    value: function _parser(script) {
-      var Plugins = {
-        js: [],
-        vue: [],
-        jsx: ['jsx'],
-        ts: ['typescript'],
-        tsx: ['jsx', 'typescript']
-      };
-
+    value: function _parser() {
       if (this.type === 'vue') {
-        return vueEslintParserPrivate.parse(script, {
-          sourceType: 'module'
-        });
+        return vueEslintParserPrivate.parse(this.content, this.parserOptions.vue);
       }
 
-      return parser$1.parse(script, {
-        sourceType: 'module',
-        plugins: Plugins[this.type].concat(this.plugins)
-      });
+      var options = this.parserOptions.babel;
+      options.plugins = (options.plugins || []).concat(Plugins[this.type]);
+      return parser$1.parse(this.content, options);
     }
   }]);
 
@@ -400,9 +409,7 @@ var VueHelpers = /*#__PURE__*/function () {
       var _this$_generate = this._generate(),
           code = _this$_generate.code;
 
-      var ast = vueEslintParserPrivate.parse(code, {
-        sourceType: 'module'
-      });
+      var ast = vueEslintParserPrivate.parse(code, this.parser.parserOptions.vue);
 
       this._traverse(ast, ['TemplateLiteral']);
     }

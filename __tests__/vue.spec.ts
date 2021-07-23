@@ -185,4 +185,23 @@ describe('Vue', () => {
       `<template><div:a=\"$t('VLiteral_3_15_3_19')\":b=\"$t('Literal_3_24_3_28')\">{{$t('TemplateLiteral_3_74_3_85',name)}}{{$t('VText_3_45_3_47')}}</div></template><script>consta=$t('TemplateLiteral_6_18_6_29',name)constb=$t('Literal_7_18_7_22')</script>`
     )
   })
+
+  test('SFC File [SpreadElement]', () => {
+    const source = `
+      <script>
+       export default {
+         computed: {
+           ...mapState({
+             name: state => 'Link',
+             contury: state => (state.contury || '中国')
+           })
+         }
+       }
+      </script>
+    `
+    const { code } = codeI18n(source)
+    expect(code).toBe(
+      `<script>exportdefault{computed:{...mapState({name:state=>'Link',contury:state=>(state.contury||$t('Literal_7_49_7_53'))})}}</script>`
+    )
+  })
 })
