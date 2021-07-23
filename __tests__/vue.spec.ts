@@ -30,6 +30,22 @@ describe('Vue', () => {
     expect(code).toBe(`<template><div>{{$t('VText_3_13_3_15')}}</div></template>`)
   })
 
+  test('SFC TemplateBody [VText Escape]', () => {
+    const source = `
+    <template>
+      <span class="back-list-text" @click="handleBack">&lt; 自动化列表</span>
+      <div>中文</div>
+    </template>
+    `
+    const { code, stack } = codeI18n(source)
+    expect(stack).toEqual(
+      expect.arrayContaining<StackItem>([{ VText_3_55_3_65: '< 自动化列表' }, { VText_4_11_4_13: '中文' }])
+    )
+    expect(code).toBe(
+      `<template><spanclass=\"back-list-text\"@click=\"handleBack\">{{$t('VText_3_55_3_65')}}</span><div>{{$t('VText_4_11_4_13')}}</div></template>`
+    )
+  })
+
   test('SFC TemplateBody [VText Multi-line]', () => {
     const source = `
       <template>

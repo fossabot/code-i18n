@@ -10,6 +10,7 @@ export default class VueHelpers {
     {
       type: string
       source: string
+      sourceLength?: number
       range: [number, number]
       key: string | number
       language: string
@@ -55,7 +56,7 @@ export default class VueHelpers {
       for (let i = 0; i < map.length; i++) {
         const [k1] = map[i]
         if (k1.range[0] > k.range[1]) {
-          const diff = k.length - k.source.length
+          const diff = k.length - (k.sourceLength || k.source.length)
           const range: [number, number] = [k1.range[0] + diff, k1.range[1] + diff]
           map[i][0] = {
             ...map[i][0],
@@ -97,10 +98,13 @@ export default class VueHelpers {
 
     if (ast.type === 'VText') {
       const v = `{{${this.fnName}('${key}')}}`
+      // fixed html Escape
+      const sourceLength = this.parser.content.slice(ast.range[0], ast.range[1]).length
       this.map.set(
         {
           type: 'VText',
           source: ast.value,
+          sourceLength: sourceLength,
           range: ast.range,
           key: key,
           language: ast.value,
