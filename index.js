@@ -569,7 +569,7 @@ function transformCode(code, config) {
   var parser = new Parser({
     content: code,
     type: config.type,
-    plugins: config.plugins
+    parserOptions: config.parserOptions
   });
   var transform = new Transform(parser, config);
   return transform.render();

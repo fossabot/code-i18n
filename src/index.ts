@@ -9,7 +9,7 @@ export function transformCode(code: string, config: Options & { type: ParserType
   const parser = new Parser({
     content: code,
     type: config.type,
-    plugins: config.plugins
+    parserOptions: config.parserOptions
   })
 
   const transform = new Transform(parser, config)

@@ -1,6 +1,6 @@
 import * as t from '@babel/types'
 import { Node } from 'vue-eslint-parser-private/ast/nodes'
-import { ParserPlugin } from '@babel/parser'
+import { ParserOptions } from '../core/parser'
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -9,5 +9,5 @@ export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType exten
 export interface Options {
   readonly identifier?: string
   ruleKey?: (node: t.Node | Node) => string | number
-  plugins?: ParserPlugin[]
+  parserOptions?: ParserOptions
 }
