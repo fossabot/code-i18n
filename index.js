@@ -70,9 +70,10 @@ var Parser = /*#__PURE__*/function () {
     _classCallCheck(this, Parser);
 
     var DEFAULT_PARSER_OPTIONS = {
+      // https://github.com/eslint/espree#options
       vue: {
         sourceType: 'module',
-        ecmaVersion: 2020,
+        ecmaVersion: 11,
         ecmaFeatures: {
           experimentalObjectRestSpread: true
         }
@@ -266,7 +267,7 @@ var VueHelpers = /*#__PURE__*/function () {
                 k1 = _map$i[0];
 
             if (k1.range[0] > k.range[1]) {
-              var diff = k.length - k.source.length;
+              var diff = k.length - (k.sourceLength || k.source.length);
               var range = [k1.range[0] + diff, k1.range[1] + diff];
               map[i][0] = _objectSpread$1(_objectSpread$1({}, map[i][0]), {}, {
                 range: range
@@ -311,10 +312,13 @@ var VueHelpers = /*#__PURE__*/function () {
       var key = this._renderKey(ast);
 
       if (ast.type === 'VText') {
-        var v = "{{".concat(this.fnName, "('").concat(key, "')}}");
+        var v = "{{".concat(this.fnName, "('").concat(key, "')}}"); // fixed html Escape
+
+        var sourceLength = this.parser.content.slice(ast.range[0], ast.range[1]).length;
         this.map.set({
           type: 'VText',
           source: ast.value,
+          sourceLength: sourceLength,
           range: ast.range,
           key: key,
           language: ast.value,
