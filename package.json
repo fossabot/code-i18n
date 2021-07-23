@@ -12,7 +12,7 @@
     "i8n"
   ],
   "author": "Link",
-  "license": "MIT",
+  "license": "BSD 3-Clause License",
   "files": [
     "__tests__",
     "src",
