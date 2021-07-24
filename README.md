@@ -96,7 +96,7 @@ Options:
 Sometimes, I just want to see a simple code conversion, we only need to enter the following information
 
 ```shell
-code-i18n -c "const message ='I love China'" -t js
+code-i18n -c "const message ='我爱中国'" -t js
 #┌─────────┬──────┬────────────────────────────────────────────────┬──────────────────────────────────────────┐
 #│ (index) │ name │                      code                      │                  stack                   │
 #├─────────┼──────┼────────────────────────────────────────────────┼──────────────────────────────────────────┤
@@ -107,7 +107,7 @@ code-i18n -c "const message ='I love China'" -t js
 The information is cropped, because there is no way to display all the information on the `console` screen. At this time, you can add the `--write` parameter to output the code to a file
 
 ```shell
-code-i18n -c "const message ='I love China'" -t js --write china.js
+code-i18n -c "const message ='我爱中国'" -t js --write china.js
 ```
 
 ```javascript
