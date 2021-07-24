@@ -6,6 +6,7 @@
 - [Type](#type)
 - [Usage](#usage)
   - [Installation](#installation)
+  - [Commander](#commander)
   - [Documentation](#documentation)
 - [Features](#features)
 - [Tests](#tests)
@@ -42,7 +43,7 @@ console.log(code) // const language = $t('StringLiteral_17_21');
 console.log(stack) // [ { StringLiteral_17_21: "中文" } ]
 ```
 
-If a parsing error occurs, it may be due to the use of unconventional syntax, such as spread syntax `[Spread syntax]` (supported by default), decorator `[Decorator]`, don't worry, you can adapt the code according to the following configuration.
+If a parsing error occurs, it may be due to the use of unconventional syntax, such as spread syntax `[Spread syntax]` (supported by default), decorator `[Decorator]`, don't worry, you can adapt the code according to the following configuration. For other grammatical errors, please pay attention to [babel](https://www.babeljs.cn/) for corresponding configuration.
 
 ```javascript
 transformCode(source, {
@@ -63,6 +64,73 @@ yarn add -D code-i18n
 
 ```shell
 npm install --save-dev code-i18n
+```
+
+### Commander
+
+`code-i18n` provides a simple and efficient command line, enter `code-i18n --help` to view all supported operations. The reason why `code` is not used as a wake-up keyword is because vscode provides the `code` command line.
+
+Before proceeding with the following operations, global installation is required
+
+```shell
+yarn global add code-i18n
+npm install -g code-i18n
+```
+
+```
+Usage: code-i18n [options]
+
+Convert your code to help you code quickly (internationalization)
+
+Options:
+  -v, --version output the version number
+  -c, --code <code> Convert the specified code
+  -n, --name <file name> Convert the specified file
+  -d, --dir <directory> Convert files under the specified path
+  -s, --stack <file name> Specify the output location of the collected language pack (json)
+  -w, --write [path] Specify the write path (only used in --code and --name) or overwrite the current file (default: false)
+  -t, --type <js | jsx | ts | tsx | vue> Specify the current code type, must be specified when using --code
+  -h, --help display help for command
+```
+
+Sometimes, I just want to see a simple code conversion, we only need to enter the following information
+
+```shell
+code-i18n -c "const message ='I love China'" -t js
+#┌─────────┬──────┬────────────────────────────────────────────────┬──────────────────────────────────────────┐
+#│ (index) │ name │                      code                      │                  stack                   │
+#├─────────┼──────┼────────────────────────────────────────────────┼──────────────────────────────────────────┤
+#│    0    │ null │ "const message = $t ...... teral_1_16_1_22');" │ '{"StringLiteral_1_16_1_22":"我爱中国"}'  │
+#└─────────┴──────┴────────────────────────────────────────────────┴──────────────────────────────────────────┘
+```
+
+The information is cropped, because there is no way to display all the information on the `console` screen. At this time, you can add the `--write` parameter to output the code to a file
+
+```shell
+code-i18n -c "const message ='I love China'" -t js --write china.js
+```
+
+```javascript
+// china.js
+const message = $t('StringLiteral_1_16_1_22');
+```
+
+`code-i18n` can also convert the corresponding files, and it is extremely simple
+
+```shell
+code-i18n -n china.js -w
+```
+
+Convert all `js` files in the directory and write
+
+```shell
+code-i18n -d. -t js -w
+```
+
+At this point, you will find that the language pack has not been generated yet. We add `-s <path>` to the command line and it will output all Chinese information in the code to a json file.
+
+```shell
+code-i18n -d. -t js -s zh-cn.json -w
 ```
 
 ### Documentation

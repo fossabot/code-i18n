@@ -4,6 +4,7 @@
 - [Type](#type)
 - [Usage](#usage)
   - [Installation](#installation)
+  - [Commander](#commander)
   - [Documentation](#documentation)
 - [Features](#features)
 - [Tests](#tests)
@@ -40,7 +41,7 @@ console.log(code) // const language = $t('StringLiteral_17_21');
 console.log(stack) // [ { StringLiteral_17_21: "中文" } ]
 ```
 
-如果发生解析错误，或许是因为使用了非常规语法，比如 展开语法 `[Spread syntax]`（默认支持）、修饰器 `[Decorator]`，不用担心，你可以按照如下配置对代码进行适配。
+如果发生解析错误，或许是因为使用了非常规语法，比如 展开语法 `[Spread syntax]`（默认支持）、修饰器 `[Decorator]`，不用担心，你可以按照如下配置对代码进行适配。其它语法错误可以关注 [babel](https://www.babeljs.cn/)，进行对应的配置。
 
 ```javascript
 transformCode(source, {
@@ -61,6 +62,73 @@ yarn add -D code-i18n
 
 ```shell
 npm install --save-dev code-i18n
+```
+
+### Commander
+
+`code-i18n` 提供了简单高效的命令行，输入 `code-i18n --help` 查看所有支持的操作。之所以没用 `code` 作为唤醒关键词，是因为 vscode 提供了 `code` 命令行。
+
+在进行下列操作之前，需要全局安装
+
+```shell
+yarn global add code-i18n
+npm install -g code-i18n
+```
+
+```
+Usage: code-i18n [options]
+
+Convert your code to help you code quickly (internationalization)
+
+Options:
+  -v, --version                           output the version number
+  -c, --code <code>                       Convert the specified code
+  -n, --name <file name>                  Convert the specified file
+  -d, --dir <directory>                   Convert files under the specified path
+  -s, --stack <file name>                 Specify the output location of the collected language pack (json)
+  -w, --write [path]                      Specify the write path (only used in --code and --name) or overwrite the current file (default: false)
+  -t, --type <js | jsx | ts | tsx | vue>  Specify the current code type, must be specified when using --code
+  -h, --help                              display help for command
+```
+
+有的时候，我只想看看一个简单的代码转换，我们只需要输入如下信息
+
+```shell
+code-i18n -c "const message = '我爱中国'" -t js
+#┌─────────┬──────┬────────────────────────────────────────────────┬──────────────────────────────────────────┐
+#│ (index) │ name │                      code                      │                  stack                   │
+#├─────────┼──────┼────────────────────────────────────────────────┼──────────────────────────────────────────┤
+#│    0    │ null │ "const message = $t ...... teral_1_16_1_22');" │ '{"StringLiteral_1_16_1_22":"我爱中国"}'  │
+#└─────────┴──────┴────────────────────────────────────────────────┴──────────────────────────────────────────┘
+```
+
+其中的信息被裁剪了，因为在 `console` 屏幕上没办法展示所有信息，这个时候可以添加 `--write` 参数，将代码输出到文件中
+
+```shell
+code-i18n -c "const message = '我爱中国'" -t js --write china.js
+```
+
+```javascript
+// china.js
+const message = $t('StringLiteral_1_16_1_22');
+```
+
+`code-i18n` 还可以转换对应的文件，并且极其简单
+
+```shell
+code-i18n -n china.js -w
+```
+
+转换目录下所有 `js` 文件，并且写入
+
+```shell
+code-i18n -d . -t js -w
+```
+
+到这里，你会发现，还没有生成语言包。我们在命令行中添加 `-s <path>` 就可以了，他会把代码中所有中文信息输出到一个 json 文件中。
+
+```shell
+code-i18n -d . -t js -s zh-cn.json -w
 ```
 
 ### Documentation

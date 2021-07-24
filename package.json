@@ -1,18 +1,21 @@
 {
   "name": "code-i18n",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Intrusive language conversion script",
   "main": "index.js",
   "types": "types/index.d.ts",
+  "bin": "bin.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "rollup -c && tsc src/**/*.ts --declaration --downlevelIteration --emitDeclarationOnly --outDir types"
+    "dev": "rollup -c -w",
+    "build": "rollup -c",
+    "t": "tsc src/**/*.ts --declaration --downlevelIteration --emitDeclarationOnly --outDir types"
   },
   "keywords": [
     "i8n"
   ],
   "author": "Link",
-  "license": "BSD 3-Clause License",
+  "license": "BSD",
   "files": [
     "__tests__",
     "src",
@@ -28,8 +31,15 @@
   "dependencies": {
     "@babel/generator": "^7.14.5",
     "@babel/parser": "^7.14.7",
+    "@babel/runtime": "^7.14.8",
     "@babel/traverse": "^7.14.7",
+    "@babel/types": "^7.14.8",
+    "chalk": "^4.1.1",
+    "commander": "^8.0.0",
+    "glob": "^7.1.7",
     "lodash": "^4.17.21",
+    "ora": "^5.4.1",
+    "prettier": "^2.3.2",
     "vue-eslint-parser-private": "7.9.0-private"
   },
   "devDependencies": {
@@ -37,6 +47,7 @@
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
     "@rollup/plugin-commonjs": "^19.0.1",
+    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@types/eslint": "^7.28.0",
     "@types/glob": "^7.1.3",
@@ -44,7 +55,6 @@
     "@types/lodash": "^4.14.171",
     "@types/request": "^2.48.5",
     "@types/uuid": "^8.3.1",
-    "glob": "^7.1.7",
     "jest": "^27.0.6",
     "request": "^2.88.2",
     "rollup": "^2.52.7",
