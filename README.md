@@ -263,6 +263,8 @@ glob(
 
 ## Features
 
+Shown here is the corresponding Node in `AST`. For more information, please refer to [estree](https://github.com/estree/estree).
+
 - StringLiteral
 - TemplateLiteral
 - JSXText

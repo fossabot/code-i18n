@@ -261,6 +261,8 @@ glob(
 
 ## Features
 
+这里展示的是 `AST` 中对应的 Node，更多信息参考 [estree](https://github.com/estree/estree)。
+
 - StringLiteral
 - TemplateLiteral
 - JSXText
