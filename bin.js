@@ -48,7 +48,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.2.0";
+var version = "2.2.1";
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -84,6 +84,21 @@ function _asyncToGenerator(fn) {
       _next(undefined);
     });
   };
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
 }
 
 function _classCallCheck(instance, Constructor) {
@@ -154,21 +169,6 @@ var Parser = /*#__PURE__*/function () {
 
   return Parser;
 }();
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
 
 function isContainChinese(str) {
   return /[\u4e00-\u9fa5]/.test(str);
@@ -251,9 +251,9 @@ function _toConsumableArray(arr) {
   return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray$1(arr) || _nonIterableSpread();
 }
 
-function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -315,7 +315,7 @@ var VueHelpers = /*#__PURE__*/function () {
             if (k1.range[0] > k.range[1]) {
               var diff = k.length - (k.sourceLength || k.source.length);
               var range = [k1.range[0] + diff, k1.range[1] + diff];
-              map[i][0] = _objectSpread$1(_objectSpread$1({}, map[i][0]), {}, {
+              map[i][0] = _objectSpread$2(_objectSpread$2({}, map[i][0]), {}, {
                 range: range
               });
             }
@@ -325,7 +325,7 @@ var VueHelpers = /*#__PURE__*/function () {
               var _diff = code.indexOf(k1.source);
 
               var _range = [_diff, _diff + k1.source.length];
-              map[i][0] = _objectSpread$1(_objectSpread$1({}, map[i][0]), {}, {
+              map[i][0] = _objectSpread$2(_objectSpread$2({}, map[i][0]), {}, {
                 range: _range
               });
             }
@@ -475,9 +475,9 @@ var VueHelpers = /*#__PURE__*/function () {
   return VueHelpers;
 }();
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var defaultRenderOptions = {
   retainLines: true,
   jsescOption: {
@@ -506,7 +506,7 @@ var Transform = /*#__PURE__*/function () {
       var _this$options2;
 
       var loc = node.loc;
-      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
+      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node, this.options.path) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
     }
   }, {
     key: "_StringFunction",
@@ -601,7 +601,7 @@ var Transform = /*#__PURE__*/function () {
         return this.VueHelpers.generate();
       }
 
-      return _objectSpread(_objectSpread({}, generate__default['default'](ast, options, this.parser.content)), {}, {
+      return _objectSpread$1(_objectSpread$1({}, generate__default['default'](ast, options, this.parser.content)), {}, {
         stack: this.stack
       });
     }
@@ -620,6 +620,9 @@ function transformCode(code, config) {
   return transform.render();
 }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var root = process.cwd();
 var spinner = ora__default['default']();
 
@@ -658,14 +661,15 @@ function formatOutput(message, stack) {
   }
 }
 
-function transformFile(filename, write) {
+function transformFile(filename, write, config) {
   var filepath = path__default['default'].resolve(root, filename);
   var filetype = path__default['default'].extname(filepath).slice(1);
   var content = fs__default['default'].readFileSync(filepath, 'utf-8');
 
-  var _transformCode = transformCode(content, {
-    type: filetype
-  }),
+  var _transformCode = transformCode(content, _objectSpread({
+    type: filetype,
+    path: filepath
+  }, config)),
       code = _transformCode.code,
       stack = _transformCode.stack;
 
@@ -682,11 +686,11 @@ function transformFile(filename, write) {
     stack: stack
   };
 }
-function transformDirectory(dir, write, type) {
+function transformDirectory(dir, write, config) {
   spinner.start('Transform ...');
   var dirpath = path__default['default'].resolve(root, dir);
   return new Promise(function (resolve, reject) {
-    glob__default['default']("**/*.".concat(type), {
+    glob__default['default']("**/*.".concat(config.type), {
       cwd: dirpath
     }, function (err, matches) {
       if (err) {
@@ -711,17 +715,9 @@ function transformDirectory(dir, write, type) {
           }
 
           try {
-            var _transformCode2 = transformCode(source.content, {
-              type: type,
-              parserOptions: {
-                vue: {
-                  ecmaVersion: 11,
-                  ecmaFeatures: {
-                    jsx: true
-                  }
-                }
-              }
-            }),
+            var _transformCode2 = transformCode(source.content, _objectSpread(_objectSpread({}, config), {}, {
+              path: source.path
+            })),
                 code = _transformCode2.code,
                 stack = _transformCode2.stack;
 
@@ -754,63 +750,102 @@ function exec(_x) {
 
 function _exec() {
   _exec = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime__default['default'].mark(function _callee(command) {
-    var _transformCode3, code, stack, filename, _transformFile, _code, _stack, message;
+    var configFile, config, have, _transformCode3, code, stack, filename, _transformFile, _code, _stack, message;
 
     return _regeneratorRuntime__default['default'].wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            configFile = path__default['default'].resolve(root, '.code-i18n.js');
+            config = {};
+
+            if (!command.config) {
+              _context.next = 6;
+              break;
+            }
+
+            config = require(path__default['default'].resolve(root, command.config));
+            _context.next = 10;
+            break;
+
+          case 6:
+            _context.next = 8;
+            return new Promise(function (r) {
+              fs__default['default'].access(configFile, function (err) {
+                return r(!err);
+              });
+            })["catch"](function (e) {
+              console.log(chalk__default['default'].red(e));
+            });
+
+          case 8:
+            have = _context.sent;
+
+            if (have) {
+              config = require(configFile);
+            }
+
+          case 10:
+            if (command.type) {
+              config = lodash.merge(config, {
+                type: command.type
+              });
+            }
+
+            if (command.debug) {
+              // assert
+              console.log("[".concat(chalk__default['default'].blue(Date.now()), "] [").concat(chalk__default['default'].green('Log'), "] Debug config: "), config);
+            }
+
             if (!(['code', 'name', 'dir'].filter(function (item) {
               return lodash.keys(command).includes(item);
             }).length >= 2)) {
-              _context.next = 3;
+              _context.next = 15;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Only one of code, name, dir can be selected'));
             return _context.abrupt("return");
 
-          case 3:
-            if (!(command.code && !command.type)) {
-              _context.next = 6;
+          case 15:
+            if (!(command.code && !config.type)) {
+              _context.next = 18;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When using the optional code parameter, you must specify its type'));
             return _context.abrupt("return");
 
-          case 6:
+          case 18:
             if (!(command.dir && typeof command.write === 'string')) {
-              _context.next = 9;
+              _context.next = 21;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Cannot use --write(path) when using --dir'));
             return _context.abrupt("return");
 
-          case 9:
-            if (!(command.dir && !command.type)) {
-              _context.next = 12;
+          case 21:
+            if (!(command.dir && !config.type)) {
+              _context.next = 24;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When you specify the path, you must set its --type, let me know which files you need to convert'));
             return _context.abrupt("return");
 
-          case 12:
-            if (!(command.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(command.type))) {
-              _context.next = 15;
+          case 24:
+            if (!(config.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(config.type))) {
+              _context.next = 27;
               break;
             }
 
-            console.log(chalk__default['default'].yellow("The optional type parameter is ".concat(command.type, ", one of these must be specified ['js','jsx','ts','tsx','vue']")));
+            console.log(chalk__default['default'].yellow("The optional type parameter is ".concat(config.type, ", one of these must be specified ['js','jsx','ts','tsx','vue']")));
             return _context.abrupt("return");
 
-          case 15:
-            if (command.code && command.type) {
-              _transformCode3 = transformCode(command.code, {
-                type: command.type
-              }), code = _transformCode3.code, stack = _transformCode3.stack;
+          case 27:
+            if (command.code) {
+              _transformCode3 = transformCode(command.code, config), code = _transformCode3.code, stack = _transformCode3.stack;
 
               if (typeof command.write === 'string') {
                 filename = path__default['default'].resolve(root, command.write);
@@ -828,7 +863,7 @@ function _exec() {
             }
 
             if (command.name) {
-              _transformFile = transformFile(command.name, command.write), _code = _transformFile.code, _stack = _transformFile.stack;
+              _transformFile = transformFile(command.name, command.write, config), _code = _transformFile.code, _stack = _transformFile.stack;
               formatOutput([{
                 code: _code,
                 stack: _stack,
@@ -840,15 +875,21 @@ function _exec() {
               }
             }
 
-            if (!(command.dir && command.type)) {
-              _context.next = 23;
+            if (!command.dir) {
+              _context.next = 36;
               break;
             }
 
-            _context.next = 20;
-            return transformDirectory(command.dir, command.write, command.type);
+            if (config.type) {
+              config = lodash.merge(config, {
+                type: config.type
+              });
+            }
 
-          case 20:
+            _context.next = 33;
+            return transformDirectory(command.dir, command.write, config);
+
+          case 33:
             message = _context.sent;
             formatOutput(message, command.stack);
 
@@ -856,7 +897,7 @@ function _exec() {
               console.log(chalk__default['default'].green("The writing is successful, and the following path is '".concat(command.dir, "'")));
             }
 
-          case 23:
+          case 36:
           case "end":
             return _context.stop();
         }
@@ -869,7 +910,7 @@ function _exec() {
 var program = new commander.Command();
 program.version(version, '-v, --version');
 program.name('code-i18n').usage('[options]');
-program.description('Convert your code to help you code quickly (internationalization)').allowUnknownOption().option('-c, --code <code>', 'Convert the specified code').option('-n, --name <file name>', 'Convert the specified file').option('-d, --dir <directory>', 'Convert files under the specified path').option('-s, --stack <file name>', 'Specify the output location of the collected language pack (json)').option('-w, --write [path]', 'Specify the write path (only used in --code and --name) or overwrite the current file', false).option('-t, --type <js | jsx | ts | tsx | vue>', 'Specify the current code type, must be specified when using --code').action(function (command) {
+program.description('Convert your code to help you code quickly (internationalization)').allowUnknownOption().option('--config <path>', 'Specify the configuration file').option('-c, --code <code>', 'Convert the specified code').option('-n, --name <file name>', 'Convert the specified file').option('-d, --dir <directory>', 'Convert files under the specified path').option('-s, --stack <file name>', 'Specify the output location of the collected language pack (json)').option('-w, --write [path]', 'Specify the write path (only used in --code and --name) or overwrite the current file', false).option('-t, --type <js | jsx | ts | tsx | vue>', 'Specify the current code type, must be specified when using --code').option('--debug', 'Output more information for debugging the program', false).action(function (command) {
   if (isEmpty(command)) {
     program.outputHelp();
   } else {

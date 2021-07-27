@@ -8,8 +8,13 @@ export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType exten
 
 export interface Options {
   readonly identifier?: string
-  ruleKey?: (node: t.Node | Node) => string | number
+  ruleKey?: (node: t.Node | Node, path?: string) => string | number
   parserOptions?: ParserOptions
+  path?: string
+}
+
+export interface Config extends Options {
+  type: ParserType
 }
 
 export interface CommandArgs {
@@ -18,4 +23,6 @@ export interface CommandArgs {
   dir: string
   type: ParserType
   stack: string
+  config: string
+  debug: boolean
 }

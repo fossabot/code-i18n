@@ -4,8 +4,8 @@ import fs from 'fs'
 import glob from 'glob'
 import ora from 'ora'
 import { transformCode } from '../index'
-import { CommandArgs } from '../interface'
-import { keys } from 'lodash'
+import { CommandArgs, Config } from '../interface'
+import { keys, merge } from 'lodash'
 import { ParserType } from '../core/parser'
 import { format } from 'prettier'
 
@@ -47,13 +47,15 @@ function formatOutput(message: FormatOutput[], stack: string | undefined) {
   }
 }
 
-export function transformFile(filename: string, write: boolean | string) {
+export function transformFile(filename: string, write: boolean | string, config: Partial<Config>) {
   const filepath = path.resolve(root, filename)
   const filetype = path.extname(filepath).slice(1) as ParserType
   const content = fs.readFileSync(filepath, 'utf-8')
 
   const { code, stack } = transformCode(content, {
     type: filetype,
+    path: filepath,
+    ...config
   })
 
   if (typeof write === 'string') {
@@ -67,14 +69,14 @@ export function transformFile(filename: string, write: boolean | string) {
   return { code, stack }
 }
 
-export function transformDirectory(dir: string, write: boolean, type: ParserType) {
+export function transformDirectory(dir: string, write: boolean, config: Partial<Config>) {
   spinner.start('Transform ...')
 
   const dirpath = path.resolve(root, dir)
 
   return new Promise<FormatOutput[]>((resolve, reject) => {
     glob(
-      `**/*.${type}`,
+      `**/*.${config.type}`,
       {
         cwd: dirpath,
       },
@@ -95,16 +97,9 @@ export function transformDirectory(dir: string, write: boolean, type: ParserType
               }
               try {
                 const { code, stack } = transformCode(source.content, {
-                  type: type,
-                  parserOptions: {
-                    vue: {
-                      ecmaVersion: 11,
-                      ecmaFeatures: {
-                        jsx: true,
-                      },
-                    },
-                  },
-                })
+                  ...config,
+                  path: source.path
+                } as Config)
 
                 if (write) {
                   fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
@@ -127,12 +122,41 @@ export function transformDirectory(dir: string, write: boolean, type: ParserType
 }
 
 export async function exec(command: Partial<CommandArgs> & { write: boolean | string }) {
+
+  const configFile = path.resolve(root, '.code-i18n.js')
+
+  let config: Partial<Config> = {}
+
+  if (command.config) {
+    config = require(path.resolve(root, command.config))
+  } else {
+    const have = await new Promise(r => {
+      fs.access(configFile, (err) => {
+        return r(!err)
+      })
+    }).catch(e => {
+      console.log(chalk.red(e))
+    })
+    if (have) {
+      config = require(configFile)
+    }
+  }
+
+  if (command.type) {
+    config = merge(config, {type: command.type})
+  }
+
+  if (command.debug) {
+    // assert
+    console.log(`[${chalk.blue(Date.now())}] [${chalk.green('Log')}] Debug config: `, config)
+  }
+
   if (['code', 'name', 'dir'].filter((item) => keys(command).includes(item)).length >= 2) {
     console.log(chalk.yellow('Only one of code, name, dir can be selected'))
     return
   }
 
-  if (command.code && !command.type) {
+  if (command.code && !config.type) {
     console.log(chalk.yellow('When using the optional code parameter, you must specify its type'))
     return
   }
@@ -142,26 +166,24 @@ export async function exec(command: Partial<CommandArgs> & { write: boolean | st
     return
   }
 
-  if (command.dir && !command.type) {
+  if (command.dir && !config.type) {
     console.log(
       chalk.yellow('When you specify the path, you must set its --type, let me know which files you need to convert')
     )
     return
   }
 
-  if (command.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(command.type)) {
+  if (config.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(config.type)) {
     console.log(
       chalk.yellow(
-        `The optional type parameter is ${command.type}, one of these must be specified ['js','jsx','ts','tsx','vue']`
+        `The optional type parameter is ${config.type}, one of these must be specified ['js','jsx','ts','tsx','vue']`
       )
     )
     return
   }
 
-  if (command.code && command.type) {
-    const { code, stack } = transformCode(command.code, {
-      type: command.type,
-    })
+  if (command.code) {
+    const { code, stack } = transformCode(command.code, config as Config)
     if (typeof command.write === 'string') {
       const filename = path.resolve(root, command.write)
       fs.writeFileSync(filename, code)
@@ -173,15 +195,18 @@ export async function exec(command: Partial<CommandArgs> & { write: boolean | st
   }
 
   if (command.name) {
-    const { code, stack } = transformFile(command.name, command.write)
+    const { code, stack } = transformFile(command.name, command.write, config)
     formatOutput([{ code, stack, name: command.name }], command.stack)
     if (command.write) {
       console.log(chalk.green(`The writing is successful, the file name is '${command.name}'`))
     }
   }
 
-  if (command.dir && command.type) {
-    const message = await transformDirectory(command.dir, command.write as boolean, command.type)
+  if (command.dir) {
+    if (config.type) {
+      config = merge(config, {type: config.type})
+    }
+    const message = await transformDirectory(command.dir, command.write as boolean, config)
     formatOutput(message, command.stack)
     if (command.write) {
       console.log(chalk.green(`The writing is successful, and the following path is '${command.dir}'`))

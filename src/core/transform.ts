@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash'
 import { isContainChinese } from '../utils/index'
-import generate, { GeneratorOptions, GeneratorResult } from '@babel/generator'
+import generate, { GeneratorOptions } from '@babel/generator'
 import traverse from '@babel/traverse'
 import { Options } from '../interface'
 import VueHelpers from './vue'
@@ -37,7 +37,7 @@ export default class Transform {
   _key(node: t.Node) {
     const loc = node.loc as t.SourceLocation
     return this.options?.ruleKey
-      ? this.options.ruleKey(node)
+      ? this.options.ruleKey(node, this.options.path)
       : `${node.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
   }
 

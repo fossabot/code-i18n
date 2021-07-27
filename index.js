@@ -460,7 +460,7 @@ var Transform = /*#__PURE__*/function () {
       var _this$options2;
 
       var loc = node.loc;
-      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
+      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node, this.options.path) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
     }
   }, {
     key: "_StringFunction",
