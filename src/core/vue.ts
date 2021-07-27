@@ -37,7 +37,7 @@ export default class VueHelpers {
   _renderKey(ast: Node) {
     const loc = ast.loc
     return this.options?.ruleKey
-      ? this.options.ruleKey(ast)
+      ? this.options.ruleKey(ast, this.options.path)
       : `${ast.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
   }
 

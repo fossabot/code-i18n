@@ -5,13 +5,16 @@ import glob from 'glob'
 import ora from 'ora'
 import { transformCode } from '../index'
 import { CommandArgs, Config } from '../interface'
-import { keys, merge } from 'lodash'
+import { keys, merge, cloneDeep } from 'lodash'
 import { ParserType } from '../core/parser'
 import { format } from 'prettier'
+import { log } from '../utils/assert'
 
 interface FormatOutput extends ReturnType<typeof transformCode> {
   name?: string
 }
+
+type Command = Partial<CommandArgs> & { write: boolean | string }
 
 const root = process.cwd()
 const spinner = ora()
@@ -69,7 +72,7 @@ export function transformFile(filename: string, write: boolean | string, config:
   return { code, stack }
 }
 
-export function transformDirectory(dir: string, write: boolean, config: Partial<Config>) {
+export function transformDirectory(dir: string, config: Partial<Config> & Command) {
   spinner.start('Transform ...')
 
   const dirpath = path.resolve(root, dir)
@@ -96,17 +99,22 @@ export function transformDirectory(dir: string, write: boolean, config: Partial<
                 return
               }
               try {
+                if (config.debug) {
+                  log('Source: ', source)
+                }
+
                 const { code, stack } = transformCode(source.content, {
                   ...config,
                   path: source.path
                 } as Config)
 
-                if (write) {
+                if (config.write) {
                   fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
                 }
+                
                 return { code, stack, name: source.path }
               } catch (e) {
-                spinner.fail('Conversion failed' + chalk.blue(source.path + ':') + JSON.stringify(e))
+                spinner.fail('Conversion failed ' + chalk.blue(source.path + ':\n') + JSON.stringify(e))
               }
             })
             .filter((item) => {
@@ -121,11 +129,13 @@ export function transformDirectory(dir: string, write: boolean, config: Partial<
   })
 }
 
-export async function exec(command: Partial<CommandArgs> & { write: boolean | string }) {
+export async function exec(command: Command) {
 
   const configFile = path.resolve(root, '.code-i18n.js')
 
-  let config: Partial<Config> = {}
+  let config: Partial<Config> & Command = {
+    write: false
+  }
 
   if (command.config) {
     config = require(path.resolve(root, command.config))
@@ -142,31 +152,32 @@ export async function exec(command: Partial<CommandArgs> & { write: boolean | st
     }
   }
 
+  config = merge(config, cloneDeep(command))
+
   if (command.type) {
     config = merge(config, {type: command.type})
   }
 
-  if (command.debug) {
-    // assert
-    console.log(`[${chalk.blue(Date.now())}] [${chalk.green('Log')}] Debug config: `, config)
+  if (config.debug) {
+    log('Config: ', config)
   }
 
-  if (['code', 'name', 'dir'].filter((item) => keys(command).includes(item)).length >= 2) {
+  if (['code', 'name', 'dir'].filter((item) => keys(config).includes(item)).length >= 2) {
     console.log(chalk.yellow('Only one of code, name, dir can be selected'))
     return
   }
 
-  if (command.code && !config.type) {
+  if (config.code && !config.type) {
     console.log(chalk.yellow('When using the optional code parameter, you must specify its type'))
     return
   }
 
-  if (command.dir && typeof command.write === 'string') {
+  if (config.dir && typeof config.write === 'string') {
     console.log(chalk.yellow('Cannot use --write(path) when using --dir'))
     return
   }
 
-  if (command.dir && !config.type) {
+  if (config.dir && !config.type) {
     console.log(
       chalk.yellow('When you specify the path, you must set its --type, let me know which files you need to convert')
     )
@@ -182,34 +193,34 @@ export async function exec(command: Partial<CommandArgs> & { write: boolean | st
     return
   }
 
-  if (command.code) {
-    const { code, stack } = transformCode(command.code, config as Config)
-    if (typeof command.write === 'string') {
-      const filename = path.resolve(root, command.write)
+  if (config.code) {
+    const { code, stack } = transformCode(config.code, config as Config)
+    if (typeof config.write === 'string') {
+      const filename = path.resolve(root, config.write)
       fs.writeFileSync(filename, code)
     }
-    if (typeof command.write === 'boolean' && command.write) {
+    if (typeof config.write === 'boolean' && config.write) {
       console.log(chalk.yellow('When using --code, --write needs to specify the path'))
     }
-    formatOutput([{ code, stack }], command.stack)
+    formatOutput([{ code, stack }], config.stack)
   }
 
-  if (command.name) {
-    const { code, stack } = transformFile(command.name, command.write, config)
-    formatOutput([{ code, stack, name: command.name }], command.stack)
-    if (command.write) {
-      console.log(chalk.green(`The writing is successful, the file name is '${command.name}'`))
+  if (config.name) {
+    const { code, stack } = transformFile(config.name, config.write, config)
+    formatOutput([{ code, stack, name: config.name }], config.stack)
+    if (config.write) {
+      console.log(chalk.green(`The writing is successful, the file name is '${config.name}'`))
     }
   }
 
-  if (command.dir) {
+  if (config.dir) {
     if (config.type) {
       config = merge(config, {type: config.type})
     }
-    const message = await transformDirectory(command.dir, command.write as boolean, config)
-    formatOutput(message, command.stack)
-    if (command.write) {
-      console.log(chalk.green(`The writing is successful, and the following path is '${command.dir}'`))
+    const message = await transformDirectory(config.dir as string, config)
+    formatOutput(message, config.stack)
+    if (config.write) {
+      console.log(chalk.green(`The writing is successful, and the following path is '${config.dir}'`))
     }
   }
 }

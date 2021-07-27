@@ -48,7 +48,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.2.1";
+var version = "2.2.2";
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -283,7 +283,7 @@ var VueHelpers = /*#__PURE__*/function () {
       var _this$options2;
 
       var loc = ast.loc;
-      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(ast) : "".concat(ast.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
+      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(ast, this.options.path) : "".concat(ast.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
     }
   }, {
     key: "_generate",
@@ -620,6 +620,16 @@ function transformCode(code, config) {
   return transform.render();
 }
 
+function log() {
+  var _console;
+
+  for (var _len = arguments.length, message = new Array(_len), _key = 0; _key < _len; _key++) {
+    message[_key] = arguments[_key];
+  }
+
+  (_console = console).log.apply(_console, ["".concat(chalk__default['default'].blue("[".concat(Date.now(), "] [Log] Debug ")))].concat(message));
+}
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -686,7 +696,7 @@ function transformFile(filename, write, config) {
     stack: stack
   };
 }
-function transformDirectory(dir, write, config) {
+function transformDirectory(dir, config) {
   spinner.start('Transform ...');
   var dirpath = path__default['default'].resolve(root, dir);
   return new Promise(function (resolve, reject) {
@@ -715,13 +725,17 @@ function transformDirectory(dir, write, config) {
           }
 
           try {
+            if (config.debug) {
+              log('Source: ', source);
+            }
+
             var _transformCode2 = transformCode(source.content, _objectSpread(_objectSpread({}, config), {}, {
               path: source.path
             })),
                 code = _transformCode2.code,
                 stack = _transformCode2.stack;
 
-            if (write) {
+            if (config.write) {
               fs__default['default'].writeFileSync(source.path, code, {
                 encoding: 'utf-8'
               });
@@ -733,7 +747,7 @@ function transformDirectory(dir, write, config) {
               name: source.path
             };
           } catch (e) {
-            spinner.fail('Conversion failed' + chalk__default['default'].blue(source.path + ':') + JSON.stringify(e));
+            spinner.fail('Conversion failed ' + chalk__default['default'].blue(source.path + ':\n') + JSON.stringify(e));
           }
         }).filter(function (item) {
           return item === null || item === void 0 ? void 0 : item.stack.length;
@@ -757,7 +771,9 @@ function _exec() {
         switch (_context.prev = _context.next) {
           case 0:
             configFile = path__default['default'].resolve(root, '.code-i18n.js');
-            config = {};
+            config = {
+              write: false
+            };
 
             if (!command.config) {
               _context.next = 6;
@@ -786,97 +802,98 @@ function _exec() {
             }
 
           case 10:
+            config = lodash.merge(config, lodash.cloneDeep(command));
+
             if (command.type) {
               config = lodash.merge(config, {
                 type: command.type
               });
             }
 
-            if (command.debug) {
-              // assert
-              console.log("[".concat(chalk__default['default'].blue(Date.now()), "] [").concat(chalk__default['default'].green('Log'), "] Debug config: "), config);
+            if (config.debug) {
+              log('Config: ', config);
             }
 
             if (!(['code', 'name', 'dir'].filter(function (item) {
-              return lodash.keys(command).includes(item);
+              return lodash.keys(config).includes(item);
             }).length >= 2)) {
-              _context.next = 15;
+              _context.next = 16;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Only one of code, name, dir can be selected'));
             return _context.abrupt("return");
 
-          case 15:
-            if (!(command.code && !config.type)) {
-              _context.next = 18;
+          case 16:
+            if (!(config.code && !config.type)) {
+              _context.next = 19;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When using the optional code parameter, you must specify its type'));
             return _context.abrupt("return");
 
-          case 18:
-            if (!(command.dir && typeof command.write === 'string')) {
-              _context.next = 21;
+          case 19:
+            if (!(config.dir && typeof config.write === 'string')) {
+              _context.next = 22;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Cannot use --write(path) when using --dir'));
             return _context.abrupt("return");
 
-          case 21:
-            if (!(command.dir && !config.type)) {
-              _context.next = 24;
+          case 22:
+            if (!(config.dir && !config.type)) {
+              _context.next = 25;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When you specify the path, you must set its --type, let me know which files you need to convert'));
             return _context.abrupt("return");
 
-          case 24:
+          case 25:
             if (!(config.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(config.type))) {
-              _context.next = 27;
+              _context.next = 28;
               break;
             }
 
             console.log(chalk__default['default'].yellow("The optional type parameter is ".concat(config.type, ", one of these must be specified ['js','jsx','ts','tsx','vue']")));
             return _context.abrupt("return");
 
-          case 27:
-            if (command.code) {
-              _transformCode3 = transformCode(command.code, config), code = _transformCode3.code, stack = _transformCode3.stack;
+          case 28:
+            if (config.code) {
+              _transformCode3 = transformCode(config.code, config), code = _transformCode3.code, stack = _transformCode3.stack;
 
-              if (typeof command.write === 'string') {
-                filename = path__default['default'].resolve(root, command.write);
+              if (typeof config.write === 'string') {
+                filename = path__default['default'].resolve(root, config.write);
                 fs__default['default'].writeFileSync(filename, code);
               }
 
-              if (typeof command.write === 'boolean' && command.write) {
+              if (typeof config.write === 'boolean' && config.write) {
                 console.log(chalk__default['default'].yellow('When using --code, --write needs to specify the path'));
               }
 
               formatOutput([{
                 code: code,
                 stack: stack
-              }], command.stack);
+              }], config.stack);
             }
 
-            if (command.name) {
-              _transformFile = transformFile(command.name, command.write, config), _code = _transformFile.code, _stack = _transformFile.stack;
+            if (config.name) {
+              _transformFile = transformFile(config.name, config.write, config), _code = _transformFile.code, _stack = _transformFile.stack;
               formatOutput([{
                 code: _code,
                 stack: _stack,
-                name: command.name
-              }], command.stack);
+                name: config.name
+              }], config.stack);
 
-              if (command.write) {
-                console.log(chalk__default['default'].green("The writing is successful, the file name is '".concat(command.name, "'")));
+              if (config.write) {
+                console.log(chalk__default['default'].green("The writing is successful, the file name is '".concat(config.name, "'")));
               }
             }
 
-            if (!command.dir) {
-              _context.next = 36;
+            if (!config.dir) {
+              _context.next = 37;
               break;
             }
 
@@ -886,18 +903,18 @@ function _exec() {
               });
             }
 
-            _context.next = 33;
-            return transformDirectory(command.dir, command.write, config);
+            _context.next = 34;
+            return transformDirectory(config.dir, config);
 
-          case 33:
+          case 34:
             message = _context.sent;
-            formatOutput(message, command.stack);
+            formatOutput(message, config.stack);
 
-            if (command.write) {
-              console.log(chalk__default['default'].green("The writing is successful, and the following path is '".concat(command.dir, "'")));
+            if (config.write) {
+              console.log(chalk__default['default'].green("The writing is successful, and the following path is '".concat(config.dir, "'")));
             }
 
-          case 36:
+          case 37:
           case "end":
             return _context.stop();
         }
