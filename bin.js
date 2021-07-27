@@ -48,7 +48,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.2.2";
+var version = "2.2.4";
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -480,6 +480,7 @@ function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if 
 function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var defaultRenderOptions = {
   retainLines: true,
+  concise: true,
   jsescOption: {
     quotes: 'single'
   }
@@ -735,10 +736,14 @@ function transformDirectory(dir, config) {
                 code = _transformCode2.code,
                 stack = _transformCode2.stack;
 
-            if (config.write) {
-              fs__default['default'].writeFileSync(source.path, code, {
-                encoding: 'utf-8'
-              });
+            if (config.write && stack.length > 0) {
+              if (config.prettier && typeof config.prettier === 'function') {
+                config.prettier(source.path, code);
+              } else {
+                fs__default['default'].writeFileSync(source.path, code, {
+                  encoding: 'utf-8'
+                });
+              }
             }
 
             return {
@@ -804,12 +809,6 @@ function _exec() {
           case 10:
             config = lodash.merge(config, lodash.cloneDeep(command));
 
-            if (command.type) {
-              config = lodash.merge(config, {
-                type: command.type
-              });
-            }
-
             if (config.debug) {
               log('Config: ', config);
             }
@@ -817,50 +816,50 @@ function _exec() {
             if (!(['code', 'name', 'dir'].filter(function (item) {
               return lodash.keys(config).includes(item);
             }).length >= 2)) {
-              _context.next = 16;
+              _context.next = 15;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Only one of code, name, dir can be selected'));
             return _context.abrupt("return");
 
-          case 16:
+          case 15:
             if (!(config.code && !config.type)) {
-              _context.next = 19;
+              _context.next = 18;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When using the optional code parameter, you must specify its type'));
             return _context.abrupt("return");
 
-          case 19:
+          case 18:
             if (!(config.dir && typeof config.write === 'string')) {
-              _context.next = 22;
+              _context.next = 21;
               break;
             }
 
             console.log(chalk__default['default'].yellow('Cannot use --write(path) when using --dir'));
             return _context.abrupt("return");
 
-          case 22:
+          case 21:
             if (!(config.dir && !config.type)) {
-              _context.next = 25;
+              _context.next = 24;
               break;
             }
 
             console.log(chalk__default['default'].yellow('When you specify the path, you must set its --type, let me know which files you need to convert'));
             return _context.abrupt("return");
 
-          case 25:
+          case 24:
             if (!(config.type && !['js', 'jsx', 'ts', 'tsx', 'vue'].includes(config.type))) {
-              _context.next = 28;
+              _context.next = 27;
               break;
             }
 
             console.log(chalk__default['default'].yellow("The optional type parameter is ".concat(config.type, ", one of these must be specified ['js','jsx','ts','tsx','vue']")));
             return _context.abrupt("return");
 
-          case 28:
+          case 27:
             if (config.code) {
               _transformCode3 = transformCode(config.code, config), code = _transformCode3.code, stack = _transformCode3.stack;
 
@@ -893,7 +892,7 @@ function _exec() {
             }
 
             if (!config.dir) {
-              _context.next = 37;
+              _context.next = 36;
               break;
             }
 
@@ -903,10 +902,10 @@ function _exec() {
               });
             }
 
-            _context.next = 34;
+            _context.next = 33;
             return transformDirectory(config.dir, config);
 
-          case 34:
+          case 33:
             message = _context.sent;
             formatOutput(message, config.stack);
 
@@ -914,7 +913,7 @@ function _exec() {
               console.log(chalk__default['default'].green("The writing is successful, and the following path is '".concat(config.dir, "'")));
             }
 
-          case 37:
+          case 36:
           case "end":
             return _context.stop();
         }

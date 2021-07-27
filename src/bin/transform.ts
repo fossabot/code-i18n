@@ -14,7 +14,9 @@ interface FormatOutput extends ReturnType<typeof transformCode> {
   name?: string
 }
 
-type Command = Partial<CommandArgs> & { write: boolean | string }
+type Command = Partial<CommandArgs> & { write: boolean | string } & Partial<{
+    prettier: (path: string, node: string) => void
+  }>
 
 const root = process.cwd()
 const spinner = ora()
@@ -58,7 +60,7 @@ export function transformFile(filename: string, write: boolean | string, config:
   const { code, stack } = transformCode(content, {
     type: filetype,
     path: filepath,
-    ...config
+    ...config,
   })
 
   if (typeof write === 'string') {
@@ -105,13 +107,17 @@ export function transformDirectory(dir: string, config: Partial<Config> & Comman
 
                 const { code, stack } = transformCode(source.content, {
                   ...config,
-                  path: source.path
+                  path: source.path,
                 } as Config)
 
-                if (config.write) {
-                  fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
+                if (config.write && stack.length > 0) {
+                  if (config.prettier && typeof config.prettier === 'function') {
+                    config.prettier(source.path, code)
+                  } else {
+                    fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
+                  }
                 }
-                
+
                 return { code, stack, name: source.path }
               } catch (e) {
                 spinner.fail('Conversion failed ' + chalk.blue(source.path + ':\n') + JSON.stringify(e))
@@ -130,21 +136,20 @@ export function transformDirectory(dir: string, config: Partial<Config> & Comman
 }
 
 export async function exec(command: Command) {
-
   const configFile = path.resolve(root, '.code-i18n.js')
 
   let config: Partial<Config> & Command = {
-    write: false
+    write: false,
   }
 
   if (command.config) {
     config = require(path.resolve(root, command.config))
   } else {
-    const have = await new Promise(r => {
+    const have = await new Promise((r) => {
       fs.access(configFile, (err) => {
         return r(!err)
       })
-    }).catch(e => {
+    }).catch((e) => {
       console.log(chalk.red(e))
     })
     if (have) {
@@ -153,10 +158,6 @@ export async function exec(command: Command) {
   }
 
   config = merge(config, cloneDeep(command))
-
-  if (command.type) {
-    config = merge(config, {type: command.type})
-  }
 
   if (config.debug) {
     log('Config: ', config)
@@ -215,7 +216,7 @@ export async function exec(command: Command) {
 
   if (config.dir) {
     if (config.type) {
-      config = merge(config, {type: config.type})
+      config = merge(config, { type: config.type })
     }
     const message = await transformDirectory(config.dir as string, config)
     formatOutput(message, config.stack)

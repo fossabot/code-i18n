@@ -9,6 +9,7 @@ import Parser from './parser'
 
 const defaultRenderOptions: GeneratorOptions = {
   retainLines: true,
+  concise: true,
   jsescOption: {
     quotes: 'single',
   },
