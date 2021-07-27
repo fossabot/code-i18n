@@ -70,6 +70,8 @@ npm install --save-dev code-i18n
 
 `code-i18n` provides a simple and efficient command line, enter `code-i18n --help` to view all supported operations. The reason why `code` is not used as a wake-up keyword is because vscode provides the `code` command line.
 
+The command line will read the `.code-i18n.js` file in the execution path by default. If `type` is specified on the command line, it will override the `type` in the configuration file.
+
 Before proceeding with the following operations, global installation is required
 
 ```shell

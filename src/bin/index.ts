@@ -13,6 +13,7 @@ program.name('code-i18n').usage('[options]')
 program
   .description('Convert your code to help you code quickly (internationalization)')
   .allowUnknownOption()
+  .option('--debug', 'Output more information for debugging the program', false)
   .option('--config <path>', 'Specify the configuration file')
   .option('-c, --code <code>', 'Convert the specified code')
   .option('-n, --name <file name>', 'Convert the specified file')
@@ -27,7 +28,7 @@ program
     '-t, --type <js | jsx | ts | tsx | vue>',
     'Specify the current code type, must be specified when using --code'
   )
-  .option('--debug', 'Output more information for debugging the program', false)
+
   .action((command: Partial<CommandArgs> & { write: boolean | string }) => {
     if (isEmpty(command)) {
       program.outputHelp()
@@ -38,5 +39,5 @@ program
   .parse(process.argv)
 
 function isEmpty(command: Partial<CommandArgs>) {
-  return keys(command).length <= 1
+  return keys(command).length <= 2
 }

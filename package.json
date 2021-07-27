@@ -9,7 +9,7 @@
     "test": "jest --coverage",
     "dev": "rollup -c -w",
     "build": "rollup -c",
-    "t": "tsc src/**/*.ts --declaration --downlevelIteration --emitDeclarationOnly --outDir types"
+    "t": "tsc src/**/*.ts --declaration --downlevelIteration --emitDeclarationOnly --resolveJsonModule --esModuleInterop --moduleResolution node --target es2020 --outDir types"
   },
   "keywords": [
     "i8n"
@@ -31,9 +31,8 @@
   "dependencies": {
     "@babel/generator": "^7.14.5",
     "@babel/parser": "^7.14.7",
-    "@babel/runtime": "^7.14.8",
+    "@babel/runtime": "^7.14.7",
     "@babel/traverse": "^7.14.7",
-    "@babel/types": "^7.14.8",
     "chalk": "^4.1.1",
     "commander": "^8.0.0",
     "glob": "^7.1.7",

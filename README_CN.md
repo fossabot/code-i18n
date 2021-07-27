@@ -68,6 +68,8 @@ npm install --save-dev code-i18n
 
 `code-i18n` 提供了简单高效的命令行，输入 `code-i18n --help` 查看所有支持的操作。之所以没用 `code` 作为唤醒关键词，是因为 vscode 提供了 `code` 命令行。
 
+命令行默认会读取执行路径下的 `.code-i18n.js` 文件。如果在命令行中指定了 `type` ，那么会覆盖配置文件中的 `type` 。
+
 在进行下列操作之前，需要全局安装
 
 ```shell
@@ -82,11 +84,14 @@ Convert your code to help you code quickly (internationalization)
 
 Options:
   -v, --version                           output the version number
+  --debug                                 Output more information for debugging the program (default: false)
+  --config <path>                         Specify the configuration file
   -c, --code <code>                       Convert the specified code
   -n, --name <file name>                  Convert the specified file
   -d, --dir <directory>                   Convert files under the specified path
   -s, --stack <file name>                 Specify the output location of the collected language pack (json)
-  -w, --write [path]                      Specify the write path (only used in --code and --name) or overwrite the current file (default: false)
+  -w, --write [path]                      Specify the write path (only used in --code and --name) or overwrite the current
+                                          file (default: false)
   -t, --type <js | jsx | ts | tsx | vue>  Specify the current code type, must be specified when using --code
   -h, --help                              display help for command
 ```
