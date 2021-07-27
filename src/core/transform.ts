@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep, merge } from 'lodash'
 import { isContainChinese } from '../utils/index'
 import generate, { GeneratorOptions } from '@babel/generator'
 import traverse from '@babel/traverse'
@@ -9,9 +9,8 @@ import Parser from './parser'
 
 const defaultRenderOptions: GeneratorOptions = {
   retainLines: true,
-  concise: true,
   jsescOption: {
-    quotes: 'single',
+    quotes: 'single'
   },
 }
 
@@ -130,8 +129,9 @@ export default class Transform {
     if (!t.isFile(this.parser.ast)) {
       return this.VueHelpers.generate()
     }
+    const config = merge(defaultRenderOptions, options || {})
     return {
-      ...generate(ast as t.File, options, this.parser.content),
+      ...generate(ast as t.File, config, this.parser.content),
       stack: this.stack,
     }
   }

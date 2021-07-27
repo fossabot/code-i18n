@@ -13,5 +13,5 @@ export function transformCode(code: string, config: Config) {
   })
 
   const transform = new Transform(parser, config)
-  return transform.render()
+  return transform.render(config.generatorOptions)
 }

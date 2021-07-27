@@ -1,6 +1,6 @@
 {
   "name": "code-i18n",
-  "version": "2.2.4",
+  "version": "2.3.0",
   "description": "Intrusive language conversion script",
   "main": "index.js",
   "types": "types/index.d.ts",

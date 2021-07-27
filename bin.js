@@ -480,7 +480,6 @@ function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if 
 function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var defaultRenderOptions = {
   retainLines: true,
-  concise: true,
   jsescOption: {
     quotes: 'single'
   }
@@ -602,7 +601,8 @@ var Transform = /*#__PURE__*/function () {
         return this.VueHelpers.generate();
       }
 
-      return _objectSpread$1(_objectSpread$1({}, generate__default['default'](ast, options, this.parser.content)), {}, {
+      var config = lodash.merge(defaultRenderOptions, options || {});
+      return _objectSpread$1(_objectSpread$1({}, generate__default['default'](ast, config, this.parser.content)), {}, {
         stack: this.stack
       });
     }
@@ -618,7 +618,7 @@ function transformCode(code, config) {
     parserOptions: config.parserOptions
   });
   var transform = new Transform(parser, config);
-  return transform.render();
+  return transform.render(config.generatorOptions);
 }
 
 function log() {
