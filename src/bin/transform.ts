@@ -15,7 +15,7 @@ interface FormatOutput extends ReturnType<typeof transformCode> {
 }
 
 type Command = Partial<CommandArgs> & { write: boolean | string } & Partial<{
-    prettier: (path: string, node: string) => void
+    prettier: (path: string, node: string) => string
   }>
 
 const root = process.cwd()
@@ -52,22 +52,28 @@ function formatOutput(message: FormatOutput[], stack: string | undefined) {
   }
 }
 
-export function transformFile(filename: string, write: boolean | string, config: Partial<Config>) {
+export function transformFile(filename: string, write: boolean | string, config: Partial<Config> & Command) {
   const filepath = path.resolve(root, filename)
   const filetype = path.extname(filepath).slice(1) as ParserType
   const content = fs.readFileSync(filepath, 'utf-8')
 
-  const { code, stack } = transformCode(content, {
+  let { code, stack } = transformCode(content, {
     type: filetype,
     path: filepath,
     ...config,
   })
 
   if (typeof write === 'string') {
+    if (config.prettier && typeof config.prettier === 'function') {
+      code = config.prettier(path.resolve(root, write), code)
+    }
     fs.writeFileSync(path.resolve(root, write), code)
   }
 
   if (typeof write === 'boolean' && write) {
+    if (config.prettier && typeof config.prettier === 'function') {
+      code = config.prettier(filepath, code)
+    }
     fs.writeFileSync(filepath, code)
   }
 
@@ -105,17 +111,16 @@ export function transformDirectory(dir: string, config: Partial<Config> & Comman
                   log('Source: ', source)
                 }
 
-                const { code, stack } = transformCode(source.content, {
+                let { code, stack } = transformCode(source.content, {
                   ...config,
                   path: source.path,
                 } as Config)
 
                 if (config.write && stack.length > 0) {
                   if (config.prettier && typeof config.prettier === 'function') {
-                    config.prettier(source.path, code)
-                  } else {
-                    fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
+                    code = config.prettier(source.path, code)
                   }
+                  fs.writeFileSync(source.path, code, { encoding: 'utf-8' })
                 }
 
                 return { code, stack, name: source.path }
@@ -195,9 +200,12 @@ export async function exec(command: Command) {
   }
 
   if (config.code) {
-    const { code, stack } = transformCode(config.code, config as Config)
+    let { code, stack } = transformCode(config.code, config as Config)
     if (typeof config.write === 'string') {
       const filename = path.resolve(root, config.write)
+      if (config.prettier && typeof config.prettier === 'function') {
+        code = config.prettier(filename, code)
+      }
       fs.writeFileSync(filename, code)
     }
     if (typeof config.write === 'boolean' && config.write) {

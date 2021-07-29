@@ -48,7 +48,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.2.4";
+var version = "2.3.0";
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
@@ -513,7 +513,7 @@ var Transform = /*#__PURE__*/function () {
     value: function _StringFunction(node) {
       var key = String(this._key(node));
       this.stack.push(_defineProperty({}, key, node.value));
-      return t__namespace.expressionStatement(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]));
+      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]);
     }
   }, {
     key: "_TemplateFunction",
@@ -534,7 +534,7 @@ var Transform = /*#__PURE__*/function () {
           args.push(expression);
         }
       });
-      return t__namespace.expressionStatement(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)].concat(args)));
+      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)].concat(args));
     }
   }, {
     key: "_JSXTextFunction",
@@ -685,10 +685,18 @@ function transformFile(filename, write, config) {
       stack = _transformCode.stack;
 
   if (typeof write === 'string') {
+    if (config.prettier && typeof config.prettier === 'function') {
+      code = config.prettier(path__default['default'].resolve(root, write), code);
+    }
+
     fs__default['default'].writeFileSync(path__default['default'].resolve(root, write), code);
   }
 
   if (typeof write === 'boolean' && write) {
+    if (config.prettier && typeof config.prettier === 'function') {
+      code = config.prettier(filepath, code);
+    }
+
     fs__default['default'].writeFileSync(filepath, code);
   }
 
@@ -738,12 +746,12 @@ function transformDirectory(dir, config) {
 
             if (config.write && stack.length > 0) {
               if (config.prettier && typeof config.prettier === 'function') {
-                config.prettier(source.path, code);
-              } else {
-                fs__default['default'].writeFileSync(source.path, code, {
-                  encoding: 'utf-8'
-                });
+                code = config.prettier(source.path, code);
               }
+
+              fs__default['default'].writeFileSync(source.path, code, {
+                encoding: 'utf-8'
+              });
             }
 
             return {
@@ -865,6 +873,11 @@ function _exec() {
 
               if (typeof config.write === 'string') {
                 filename = path__default['default'].resolve(root, config.write);
+
+                if (config.prettier && typeof config.prettier === 'function') {
+                  code = config.prettier(filename, code);
+                }
+
                 fs__default['default'].writeFileSync(filename, code);
               }
 

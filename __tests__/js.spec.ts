@@ -14,7 +14,7 @@ function codeI18n(source: string, config?: Options) {
   })
 
   const transform = new Transform(parser, config)
-  return transform.render()
+  return transform.render(config?.generatorOptions)
 }
 
 type StackItem = Record<string, string>
@@ -53,9 +53,7 @@ describe('JS', () => {
       b}\${null}
     \``
     const { code } = codeI18n(source)
-    expect(code).toBe(`const language = $t('TemplateLiteral_1_17_4_5',
-c || $t('StringLiteral_2_11_2_15'),
-b, null);`)
+    expect(code).toBe(`const language = $t('TemplateLiteral_1_17_4_5', c || $t('StringLiteral_2_11_2_15'), b, null);`)
   })
 
   test('Transform [Options identifier]', () => {
@@ -73,5 +71,22 @@ b, null);`)
       ruleKey: (node) => `${node.type}_uuid`
     })
     expect(code).toBe("const language = i18n('StringLiteral_uuid');")
+  })
+
+  test('Transform [Options identifier]', () => {
+    const source = `const babel = {
+      version: '7.1',
+      author: '中国'
+    }`
+    const { code } = codeI18n(source, {
+      identifier: 'i18n',
+      generatorOptions: {
+        retainLines: false
+      }
+    })
+    expect(code).toBe(`const babel = {
+  version: '7.1',
+  author: i18n('StringLiteral_3_14_3_18')
+};`)
   })
 })

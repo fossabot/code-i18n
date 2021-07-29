@@ -46,7 +46,7 @@ export default class Transform {
     this.stack.push({
       [key]: node.value,
     })
-    return t.expressionStatement(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
+    return t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)])
   }
 
   _TemplateFunction(node: t.TemplateLiteral) {
@@ -69,7 +69,7 @@ export default class Transform {
         args.push(expression)
       }
     })
-    return t.expressionStatement(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key), ...args]))
+    return t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key), ...args])
   }
 
   _JSXTextFunction(node: t.JSXText) {

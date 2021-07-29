@@ -467,7 +467,7 @@ var Transform = /*#__PURE__*/function () {
     value: function _StringFunction(node) {
       var key = String(this._key(node));
       this.stack.push(_defineProperty({}, key, node.value));
-      return t__namespace.expressionStatement(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]));
+      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]);
     }
   }, {
     key: "_TemplateFunction",
@@ -488,7 +488,7 @@ var Transform = /*#__PURE__*/function () {
           args.push(expression);
         }
       });
-      return t__namespace.expressionStatement(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)].concat(args)));
+      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)].concat(args));
     }
   }, {
     key: "_JSXTextFunction",
