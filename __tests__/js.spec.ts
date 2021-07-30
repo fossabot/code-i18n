@@ -1,5 +1,6 @@
 import Parser from '../src/core/parser'
 import Transform from '../src/core/transform'
+import { print } from 'recast'
 import { Options } from '../src/interface/index'
 
 function codeI18n(source: string, config?: Options) {
@@ -8,8 +9,8 @@ function codeI18n(source: string, config?: Options) {
     type: 'js',
     parserOptions: {
       babel: {
-        plugins: [['decorators', {decoratorsBeforeExport: true}]]
-      }
+        plugins: [['decorators', { decoratorsBeforeExport: true }]],
+      },
     },
   })
 
@@ -52,7 +53,11 @@ describe('JS', () => {
     \${c || '测试'}中文\${
       b}\${null}
     \``
-    const { code } = codeI18n(source)
+    const { code } = codeI18n(source, {
+      generatorOptions: {
+        retainLines: false
+      }
+    })
     expect(code).toBe(`const language = $t('TemplateLiteral_1_17_4_5', c || $t('StringLiteral_2_11_2_15'), b, null);`)
   })
 
@@ -68,7 +73,7 @@ describe('JS', () => {
     const source = 'const language = "中文"'
     const { code } = codeI18n(source, {
       identifier: 'i18n',
-      ruleKey: (node) => `${node.type}_uuid`
+      ruleKey: (node) => `${node.type}_uuid`,
     })
     expect(code).toBe("const language = i18n('StringLiteral_uuid');")
   })
@@ -81,12 +86,29 @@ describe('JS', () => {
     const { code } = codeI18n(source, {
       identifier: 'i18n',
       generatorOptions: {
-        retainLines: false
-      }
+        retainLines: false,
+      },
     })
     expect(code).toBe(`const babel = {
   version: '7.1',
   author: i18n('StringLiteral_3_14_3_18')
+};`)
+  })
+
+  test('Transform [Options identifier]', () => {
+    const source = `const babel = {
+      version() {},
+      author: '中国'
+    }`
+    const { ast } = codeI18n(source, {
+      identifier: 'i18n',
+    })
+    const code = print(ast, {
+      tabWidth: 2
+    }).code
+    expect(code).toBe(`const babel = {
+  version() {},
+  author: i18n(\"StringLiteral_3_14_3_18\")
 };`)
   })
 })

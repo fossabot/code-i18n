@@ -603,7 +603,8 @@ var Transform = /*#__PURE__*/function () {
 
       var config = lodash.merge(defaultRenderOptions, options || {});
       return _objectSpread$1(_objectSpread$1({}, generate__default['default'](ast, config, this.parser.content)), {}, {
-        stack: this.stack
+        stack: this.stack,
+        ast: ast
       });
     }
   }]);
@@ -682,21 +683,18 @@ function transformFile(filename, write, config) {
     path: filepath
   }, config)),
       code = _transformCode.code,
-      stack = _transformCode.stack;
+      stack = _transformCode.stack,
+      ast = _transformCode.ast;
+
+  if (config.prettier && typeof config.prettier === 'function') {
+    code = config.prettier(code, ast);
+  }
 
   if (typeof write === 'string') {
-    if (config.prettier && typeof config.prettier === 'function') {
-      code = config.prettier(path__default['default'].resolve(root, write), code);
-    }
-
     fs__default['default'].writeFileSync(path__default['default'].resolve(root, write), code);
   }
 
   if (typeof write === 'boolean' && write) {
-    if (config.prettier && typeof config.prettier === 'function') {
-      code = config.prettier(filepath, code);
-    }
-
     fs__default['default'].writeFileSync(filepath, code);
   }
 
@@ -742,13 +740,14 @@ function transformDirectory(dir, config) {
               path: source.path
             })),
                 code = _transformCode2.code,
-                stack = _transformCode2.stack;
+                stack = _transformCode2.stack,
+                _ast = _transformCode2.ast;
+
+            if (config.prettier && typeof config.prettier === 'function') {
+              code = config.prettier(code, _ast);
+            }
 
             if (config.write && stack.length > 0) {
-              if (config.prettier && typeof config.prettier === 'function') {
-                code = config.prettier(source.path, code);
-              }
-
               fs__default['default'].writeFileSync(source.path, code, {
                 encoding: 'utf-8'
               });
@@ -777,7 +776,7 @@ function exec(_x) {
 
 function _exec() {
   _exec = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime__default['default'].mark(function _callee(command) {
-    var configFile, config, have, _transformCode3, code, stack, filename, _transformFile, _code, _stack, message;
+    var configFile, config, have, _transformCode3, code, stack, _ast2, filename, _transformFile, _code, _stack, message;
 
     return _regeneratorRuntime__default['default'].wrap(function _callee$(_context) {
       while (1) {
@@ -869,15 +868,14 @@ function _exec() {
 
           case 27:
             if (config.code) {
-              _transformCode3 = transformCode(config.code, config), code = _transformCode3.code, stack = _transformCode3.stack;
+              _transformCode3 = transformCode(config.code, config), code = _transformCode3.code, stack = _transformCode3.stack, _ast2 = _transformCode3.ast;
+
+              if (config.prettier && typeof config.prettier === 'function') {
+                code = config.prettier(code, _ast2);
+              }
 
               if (typeof config.write === 'string') {
                 filename = path__default['default'].resolve(root, config.write);
-
-                if (config.prettier && typeof config.prettier === 'function') {
-                  code = config.prettier(filename, code);
-                }
-
                 fs__default['default'].writeFileSync(filename, code);
               }
 

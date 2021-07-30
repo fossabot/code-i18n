@@ -4,7 +4,7 @@
 - [Type](#type)
 - [Usage](#usage)
   - [Installation](#installation)
-  - [Commander](#commander)
+  - [CLI](#cli)
   - [Documentation](#documentation)
 - [Features](#features)
 - [Tests](#tests)
@@ -64,11 +64,32 @@ yarn add -D code-i18n
 npm install --save-dev code-i18n
 ```
 
-### Commander
+### CLI
 
 `code-i18n` 提供了简单高效的命令行，输入 `code-i18n --help` 查看所有支持的操作。之所以没用 `code` 作为唤醒关键词，是因为 vscode 提供了 `code` 命令行。
 
 命令行默认会读取执行路径下的 `.code-i18n.js` 文件。如果在命令行中指定了 `type` ，那么会覆盖配置文件中的 `type` 。
+
+详细配置如下：
+
+```javascript
+const recast = require('recast')
+
+const option = {
+  // 参考 https://github.com/Linkontoask/code-i18n/blob/next/types/interface/index.d.ts#L11
+}
+module.exports = {
+  ...options,
+  prettier: (code, ast) => {
+    if (ast) {
+      return recast.print(ast, {
+        tabWidth: 2
+      }).code
+    }
+    return code
+  }
+}
+```
 
 在进行下列操作之前，需要全局安装
 

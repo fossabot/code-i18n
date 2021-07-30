@@ -4,4 +4,5 @@ export * as Transform from './core/transform';
 export declare function transformCode(code: string, config: Config): {
     code: string;
     stack: Record<string, string>[];
+    ast?: import("@babel/types").File;
 };

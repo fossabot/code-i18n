@@ -557,7 +557,8 @@ var Transform = /*#__PURE__*/function () {
 
       var config = lodash.merge(defaultRenderOptions, options || {});
       return _objectSpread(_objectSpread({}, generate__default['default'](ast, config, this.parser.content)), {}, {
-        stack: this.stack
+        stack: this.stack,
+        ast: ast
       });
     }
   }]);

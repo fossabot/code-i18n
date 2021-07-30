@@ -124,7 +124,7 @@ export default class Transform {
     }
   }
 
-  render(options: GeneratorOptions = defaultRenderOptions): { code: string; stack: Record<string, string>[] } {
+  render(options: GeneratorOptions = defaultRenderOptions): { code: string; stack: Record<string, string>[]; ast?: t.File } {
     const ast = this.transform()
     if (!t.isFile(this.parser.ast)) {
       return this.VueHelpers.generate()
@@ -133,6 +133,7 @@ export default class Transform {
     return {
       ...generate(ast as t.File, config, this.parser.content),
       stack: this.stack,
+      ast: ast
     }
   }
 }

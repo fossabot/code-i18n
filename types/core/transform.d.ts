@@ -12,8 +12,8 @@ export default class Transform {
     VueHelpers: VueHelpers;
     constructor(parser: Parser, options?: Options);
     _key(node: t.Node): string | number;
-    _StringFunction(node: t.StringLiteral): t.ExpressionStatement;
-    _TemplateFunction(node: t.TemplateLiteral): t.ExpressionStatement;
+    _StringFunction(node: t.StringLiteral): t.CallExpression;
+    _TemplateFunction(node: t.TemplateLiteral): t.CallExpression;
     _JSXTextFunction(node: t.JSXText): t.JSXExpressionContainer;
     _JSXAttributeFunction(node: t.JSXAttribute): t.JSXAttribute;
     _transform(): t.File;
@@ -21,5 +21,6 @@ export default class Transform {
     render(options?: GeneratorOptions): {
         code: string;
         stack: Record<string, string>[];
+        ast?: t.File;
     };
 }

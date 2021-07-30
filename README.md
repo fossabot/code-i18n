@@ -6,7 +6,7 @@
 - [Type](#type)
 - [Usage](#usage)
   - [Installation](#installation)
-  - [Commander](#commander)
+  - [CLI](#cli)
   - [Documentation](#documentation)
 - [Features](#features)
 - [Tests](#tests)
@@ -66,11 +66,32 @@ yarn add -D code-i18n
 npm install --save-dev code-i18n
 ```
 
-### Commander
+### CLI
 
 `code-i18n` provides a simple and efficient command line, enter `code-i18n --help` to view all supported operations. The reason why `code` is not used as a wake-up keyword is because vscode provides the `code` command line.
 
 The command line will read the `.code-i18n.js` file in the execution path by default. If `type` is specified on the command line, it will override the `type` in the configuration file.
+
+The detailed configuration is as follows:
+
+```javascript
+const recast = require('recast')
+
+const option = {
+  // refer to https://github.com/Linkontoask/code-i18n/blob/next/types/interface/index.d.ts#L11
+}
+module.exports = {
+  ...options,
+  prettier: (code, ast) => {
+    if (ast) {
+      return recast.print(ast, {
+        tabWidth: 2
+      }).code
+    }
+    return code
+  }
+}
+```
 
 Before proceeding with the following operations, global installation is required
 
