@@ -1,6 +1,6 @@
 # code-i18n
 
-- [英文文档](./README_EN.md)
+- [English document](./README_EN.md)
 - [What is this?](#what-is-this)
 - [Type](#type)
 - [Usage](#usage)
