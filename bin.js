@@ -48,7 +48,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.3.0";
+var version = "2.4.0";
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
