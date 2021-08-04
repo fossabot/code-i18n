@@ -228,7 +228,7 @@ var VueHelpers = /*#__PURE__*/function () {
     this.parser = parser;
     this.stack = [];
     this.content = this.parser.content;
-    this.fnName = ((_this$options = this.options) === null || _this$options === void 0 ? void 0 : _this$options.identifier) || this.identifier;
+    this.identifier = ((_this$options = this.options) === null || _this$options === void 0 ? void 0 : _this$options.identifier) || this.identifier;
   }
 
   _createClass(VueHelpers, [{
@@ -312,7 +312,7 @@ var VueHelpers = /*#__PURE__*/function () {
       var key = this._renderKey(ast);
 
       if (ast.type === 'VText') {
-        var v = "{{".concat(this.fnName, "('").concat(key, "')}}"); // fixed html Escape
+        var v = "{{".concat(this.identifier, "('").concat(key, "')}}"); // fixed html Escape
 
         var sourceLength = this.parser.content.slice(ast.range[0], ast.range[1]).length;
         this.map.set({
@@ -330,7 +330,7 @@ var VueHelpers = /*#__PURE__*/function () {
         var rawkey = ast.parent.key.rawName;
         var source = this.parser.content.slice(ast.parent.range[0], ast.parent.range[1]);
 
-        var _v = ":".concat(rawkey, "=\"").concat(this.fnName, "('").concat(key, "')\"");
+        var _v = ":".concat(rawkey, "=\"").concat(this.identifier, "('").concat(key, "')\"");
 
         this.map.set({
           type: 'VLiteral',
@@ -345,7 +345,7 @@ var VueHelpers = /*#__PURE__*/function () {
       if (ast.type === 'Literal') {
         var _source = ast.raw;
 
-        var _v2 = "".concat(this.fnName, "('").concat(key, "')");
+        var _v2 = "".concat(this.identifier, "('").concat(key, "')");
 
         this.map.set({
           type: 'Literal',
@@ -378,7 +378,7 @@ var VueHelpers = /*#__PURE__*/function () {
           }).join('').slice(2), ".{0,}\\}"));
           language = language.replace(regexp, "{".concat(i++, "}"));
         });
-        var v = "".concat(this.fnName, "('").concat(key, "'").concat(args.length ? ',' : '', " ").concat(args.join(', '), ")");
+        var v = "".concat(this.identifier, "('").concat(key, "'").concat(args.length ? ',' : '', " ").concat(args.join(', '), ")");
         this.map.set({
           type: 'TemplateLiteral',
           source: source,
@@ -449,7 +449,7 @@ var Transform = /*#__PURE__*/function () {
 
     this.parser = parser;
     this.options = options;
-    this.fnName = ((_this$options = this.options) === null || _this$options === void 0 ? void 0 : _this$options.identifier) || this.identifier;
+    this.identifier = ((_this$options = this.options) === null || _this$options === void 0 ? void 0 : _this$options.identifier) || this.identifier;
     this.stack = [];
     this.VueHelpers = new VueHelpers(parser, options);
   }
@@ -467,7 +467,7 @@ var Transform = /*#__PURE__*/function () {
     value: function _StringFunction(node) {
       var key = String(this._key(node));
       this.stack.push(_defineProperty({}, key, node.value));
-      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]);
+      return t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]);
     }
   }, {
     key: "_TemplateFunction",
@@ -488,21 +488,21 @@ var Transform = /*#__PURE__*/function () {
           args.push(expression);
         }
       });
-      return t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)].concat(args));
+      return t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)].concat(args));
     }
   }, {
     key: "_JSXTextFunction",
     value: function _JSXTextFunction(node) {
       var key = String(this._key(node));
       this.stack.push(_defineProperty({}, key, node.value));
-      return t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]));
+      return t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]));
     }
   }, {
     key: "_JSXAttributeFunction",
     value: function _JSXAttributeFunction(node) {
       var key = String(this._key(node));
       this.stack.push(_defineProperty({}, key, node.value.value));
-      var value = t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.fnName), [t__namespace.stringLiteral(key)]));
+      var value = t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]));
       return t__namespace.jSXAttribute(node.name, value);
     }
   }, {

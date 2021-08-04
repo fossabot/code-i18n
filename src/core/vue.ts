@@ -20,8 +20,7 @@ export default class VueHelpers {
   >
   readonly parser: Parser
   readonly options: Options | undefined
-  readonly identifier = '$t'
-  readonly fnName: string
+  private identifier = '$t'
   private stack: Record<string, string>[]
   private content: string
 
@@ -31,7 +30,7 @@ export default class VueHelpers {
     this.parser = parser
     this.stack = []
     this.content = this.parser.content
-    this.fnName = this.options?.identifier || this.identifier
+    this.identifier = this.options?.identifier || this.identifier
   }
 
   _renderKey(ast: Node) {
@@ -97,7 +96,7 @@ export default class VueHelpers {
     const key = this._renderKey(ast)
 
     if (ast.type === 'VText') {
-      const v = `{{${this.fnName}('${key}')}}`
+      const v = `{{${this.identifier}('${key}')}}`
       // fixed html Escape
       const sourceLength = this.parser.content.slice(ast.range[0], ast.range[1]).length
       this.map.set(
@@ -116,7 +115,7 @@ export default class VueHelpers {
     if (ast.type === 'VLiteral') {
       const rawkey = ast.parent.key.rawName
       const source = this.parser.content.slice(ast.parent.range[0], ast.parent.range[1])
-      const v = `:${rawkey}="${this.fnName}('${key}')"`
+      const v = `:${rawkey}="${this.identifier}('${key}')"`
       this.map.set(
         {
           type: 'VLiteral',
@@ -132,7 +131,7 @@ export default class VueHelpers {
 
     if (ast.type === 'Literal') {
       const source = (ast as unknown as { raw: string }).raw
-      const v = `${this.fnName}('${key}')`
+      const v = `${this.identifier}('${key}')`
       this.map.set(
         {
           type: 'Literal',
@@ -171,7 +170,7 @@ export default class VueHelpers {
         language = language.replace(regexp, `{${i++}}`)
       })
 
-      const v = `${this.fnName}('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
+      const v = `${this.identifier}('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
       this.map.set(
         {
           type: 'TemplateLiteral',

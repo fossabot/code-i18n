@@ -6,9 +6,8 @@ import Parser from './parser';
 export default class Transform {
     readonly parser: Parser;
     readonly options: Options | undefined;
-    readonly fnName: string;
     readonly stack: Record<string, string>[];
-    readonly identifier = "$t";
+    private identifier;
     VueHelpers: VueHelpers;
     constructor(parser: Parser, options?: Options);
     _key(node: t.Node): string | number;

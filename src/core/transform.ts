@@ -17,10 +17,9 @@ const defaultRenderOptions: GeneratorOptions = {
 export default class Transform {
   readonly parser: Parser
   readonly options: Options | undefined
-  readonly fnName: string
   readonly stack: Record<string, string>[]
 
-  readonly identifier = '$t'
+  private identifier = '$t'
   
   VueHelpers: VueHelpers
 
@@ -28,7 +27,7 @@ export default class Transform {
     this.parser = parser
     this.options = options
 
-    this.fnName = this.options?.identifier || this.identifier
+    this.identifier = this.options?.identifier || this.identifier
     this.stack = []
 
     this.VueHelpers = new VueHelpers(parser, options)
@@ -46,7 +45,7 @@ export default class Transform {
     this.stack.push({
       [key]: node.value,
     })
-    return t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)])
+    return t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key)])
   }
 
   _TemplateFunction(node: t.TemplateLiteral) {
@@ -69,7 +68,7 @@ export default class Transform {
         args.push(expression)
       }
     })
-    return t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key), ...args])
+    return t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key), ...args])
   }
 
   _JSXTextFunction(node: t.JSXText) {
@@ -77,7 +76,7 @@ export default class Transform {
     this.stack.push({
       [key]: node.value,
     })
-    return t.jSXExpressionContainer(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
+    return t.jSXExpressionContainer(t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key)]))
   }
 
   _JSXAttributeFunction(node: t.JSXAttribute) {
@@ -85,7 +84,7 @@ export default class Transform {
     this.stack.push({
       [key]: (node.value as t.StringLiteral).value,
     })
-    const value = t.jSXExpressionContainer(t.callExpression(t.identifier(this.fnName), [t.stringLiteral(key)]))
+    const value = t.jSXExpressionContainer(t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key)]))
     return t.jSXAttribute(node.name, value)
   }
 
