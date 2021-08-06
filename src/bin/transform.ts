@@ -3,6 +3,7 @@ import path from 'path'
 import fs from 'fs'
 import glob from 'glob'
 import ora from 'ora'
+import inquirer from 'inquirer'
 import * as t from '@babel/types'
 import { transformCode } from '../index'
 import { CommandArgs, Config } from '../interface'
@@ -19,14 +20,30 @@ type Command = Partial<CommandArgs> & { write: boolean | string } & Partial<{
     prettier: (node: string, ast?: t.File) => string
   }>
 
+const enum LanguageAction {
+  Cover = 'cover',
+  Ignore = 'ignore',
+  Interrupt = 'interrupt',
+}
+
 const root = process.cwd()
 const spinner = ora()
+
+function checkFileExist(path: string) {
+  return new Promise((r) => {
+    fs.access(path, (err) => {
+      return r(!err)
+    })
+  }).catch((e) => {
+    console.log(chalk.red(e))
+  })
+}
 
 function crop(s: string) {
   return s.length > 36 ? s.slice(0, 18) + ' ...... ' + s.slice(-18) : s
 }
 
-function formatOutput(message: FormatOutput[], stack: string | undefined) {
+async function formatOutput(message: FormatOutput[], stack: string | undefined) {
   const t = message.map(({ code, stack, name }) => {
     return {
       name: name || null,
@@ -39,17 +56,38 @@ function formatOutput(message: FormatOutput[], stack: string | undefined) {
   if (stack) {
     const stackPath = path.resolve(root, stack)
     const so = message.map((m) => m.stack).flat()
-    const o = so.reduce((prev, cur) => {
+    let o = so.reduce((prev, cur) => {
       const k = keys(cur)[0]
       prev[k] = cur[k]
       return prev
     }, {})
-    fs.writeFileSync(
-      stackPath,
-      format(JSON.stringify(o), {
-        parser: 'json',
-      })
-    )
+    const have = await checkFileExist(stackPath)
+    if (have) {
+      inquirer
+        .prompt({
+          type: 'list',
+          message: 'The file already exists, please select the corresponding operation?',
+          choices: [LanguageAction.Cover, LanguageAction.Ignore, LanguageAction.Interrupt],
+        })
+        .then((v) => {
+          const answer = v as LanguageAction
+          if (answer === LanguageAction.Cover) {
+            o = Object.assign(o, require(stackPath))
+          }
+          if (answer === LanguageAction.Ignore) {
+            // ignore
+          }
+          if (answer === LanguageAction.Interrupt) {
+            return
+          }
+          fs.writeFileSync(
+            stackPath,
+            format(JSON.stringify(o), {
+              parser: 'json',
+            })
+          )
+        })
+    }
   }
 }
 
@@ -148,13 +186,7 @@ export async function exec(command: Command) {
   if (command.config) {
     config = require(path.resolve(root, command.config))
   } else {
-    const have = await new Promise((r) => {
-      fs.access(configFile, (err) => {
-        return r(!err)
-      })
-    }).catch((e) => {
-      console.log(chalk.red(e))
-    })
+    const have = await checkFileExist(configFile)
     if (have) {
       config = require(configFile)
     }
