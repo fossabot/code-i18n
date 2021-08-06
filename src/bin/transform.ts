@@ -20,9 +20,9 @@ type Command = Partial<CommandArgs> & { write: boolean | string } & Partial<{
     prettier: (node: string, ast?: t.File) => string
   }>
 
-const enum LanguageAction {
+enum LanguageAction {
   Cover = 'cover',
-  Ignore = 'ignore',
+  Merge = 'merge',
   Interrupt = 'interrupt',
 }
 
@@ -41,6 +41,29 @@ function checkFileExist(path: string) {
 
 function crop(s: string) {
   return s.length > 36 ? s.slice(0, 18) + ' ...... ' + s.slice(-18) : s
+}
+
+function writeLanguage(stackPath: string, language: Record<string, string>) {
+  try {
+    fs.writeFileSync(
+      stackPath,
+      format(JSON.stringify(language), {
+        parser: 'json',
+      })
+    )
+    console.log(chalk.green('The language pack is written successfully, location: ' + stackPath))
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+function writeCode(path: string, code: string) {
+  try {
+    fs.writeFileSync(path, code)
+    console.log(chalk.green(`The writing is successful, the file name is '${path}'`))
+  } catch(e) {
+    console.log(e)
+  }
 }
 
 async function formatOutput(message: FormatOutput[], stack: string | undefined) {
@@ -66,27 +89,30 @@ async function formatOutput(message: FormatOutput[], stack: string | undefined) 
       inquirer
         .prompt({
           type: 'list',
-          message: 'The file already exists, please select the corresponding operation?',
-          choices: [LanguageAction.Cover, LanguageAction.Ignore, LanguageAction.Interrupt],
+          name: 'language',
+          message: `The file already exists, please select the corresponding operation? (${stackPath})`,
+          
+          choices: [LanguageAction.Cover, LanguageAction.Merge, LanguageAction.Interrupt],
         })
-        .then((v) => {
-          const answer = v as LanguageAction
+        .then(({ language }) => {
+          const answer = language as LanguageAction
           if (answer === LanguageAction.Cover) {
-            o = Object.assign(o, require(stackPath))
+            // cover
           }
-          if (answer === LanguageAction.Ignore) {
-            // ignore
+          if (answer === LanguageAction.Merge) {
+            try {
+              o = Object.assign(o, require(stackPath))
+            } catch (e) {
+              console.log(e)
+            }
           }
           if (answer === LanguageAction.Interrupt) {
             return
           }
-          fs.writeFileSync(
-            stackPath,
-            format(JSON.stringify(o), {
-              parser: 'json',
-            })
-          )
+          writeLanguage(stackPath, o)
         })
+    } else {
+      writeLanguage(stackPath, o)
     }
   }
 }
@@ -105,11 +131,12 @@ export function transformFile(filename: string, write: boolean | string, config:
     code = config.prettier(code, ast)
   }
   if (typeof write === 'string') {
-    fs.writeFileSync(path.resolve(root, write), code)
+    const codePath = path.resolve(root, write)
+    writeCode(codePath, code)
   }
 
   if (typeof write === 'boolean' && write) {
-    fs.writeFileSync(filepath, code)
+    writeCode(filepath, code)
   }
 
   return { code, stack }
@@ -247,9 +274,6 @@ export async function exec(command: Command) {
   if (config.name) {
     const { code, stack } = transformFile(config.name, config.write, config)
     formatOutput([{ code, stack, name: config.name }], config.stack)
-    if (config.write) {
-      console.log(chalk.green(`The writing is successful, the file name is '${config.name}'`))
-    }
   }
 
   if (config.dir) {
