@@ -1,5 +1,5 @@
 import Parser from '../src/core/parser'
-import Transform, {  } from '../src/core/transform'
+import Transform from '../src/core/transform'
 import { Options } from '../src/interface/index'
 
 function codeI18n(source: string, config?: Options) {

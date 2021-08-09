@@ -15,7 +15,7 @@ English is with `google tranlate` automatic translation
 
 ## What is this?
 
-`code-i18n` is a script that converts Chinese in the code into executable functions
+`code-i18n` Out-of-the-box project internationalization tools
 [![Netlify Status](https://api.netlify.com/api/v1/badges/644b446a-84ff-45cd-8267-c6b501b04114/deploy-status)](https://app.netlify.com/sites/code-i18n/deploys)
 
 ## Type

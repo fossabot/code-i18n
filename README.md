@@ -12,7 +12,7 @@
 
 ## What is this?
 
-`code-i18n` 是将代码中的中文转换为可执行函数的脚本
+`code-i18n` 开箱即用的项目国际化工具
 [![Netlify Status](https://api.netlify.com/api/v1/badges/644b446a-84ff-45cd-8267-c6b501b04114/deploy-status)](https://app.netlify.com/sites/code-i18n/deploys)
 
 ## Type
