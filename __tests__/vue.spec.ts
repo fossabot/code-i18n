@@ -6,6 +6,7 @@ function codeI18n(source: string, config?: Options) {
   const parser = new Parser({
     content: source,
     type: 'vue',
+    parserOptions: config?.parserOptions,
   })
 
   const transform = new Transform(parser, config)
@@ -219,5 +220,21 @@ describe('Vue', () => {
     expect(code).toBe(
       `<script>exportdefault{computed:{...mapState({name:state=>'Link',contury:state=>(state.contury||$t('Literal_7_49_7_53'))})}}</script>`
     )
+  })
+
+  test('SFC Script [lang="ts"]', () => {
+    const source = `
+      <script lang="ts">
+        const a: string = '名字'
+      </script>
+    `
+    const { code } = codeI18n(source, {
+      parserOptions: {
+        vue: {
+          parser: '@typescript-eslint/parser',
+        },
+      },
+    })
+    expect(code).toBe(`<scriptlang="ts">consta:string=$t('Literal_3_26_3_30')</script>`)
   })
 })
