@@ -12,8 +12,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-src/output
-src/input
-src/*.json
-
 coverage

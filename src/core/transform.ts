@@ -20,7 +20,7 @@ export default class Transform {
   readonly stack: Record<string, string>[]
 
   private identifier = '$t'
-  
+
   VueHelpers: VueHelpers
 
   constructor(parser: Parser, options?: Options) {
@@ -117,22 +117,26 @@ export default class Transform {
     return ast
   }
 
-  transform() {
-    if (t.isFile(this.parser.ast)) {
-      return this._transform()
-    }
-  }
+  _generate(ast: t.File, options: GeneratorOptions) {
+    const { code } = generate(ast, options, this.parser.content)
 
-  render(options: GeneratorOptions = defaultRenderOptions): { code: string; stack: Record<string, string>[]; ast?: t.File } {
-    const ast = this.transform()
-    if (!t.isFile(this.parser.ast)) {
-      return this.VueHelpers.generate()
-    }
-    const config = merge(defaultRenderOptions, options || {})
     return {
-      ...generate(ast as t.File, config, this.parser.content),
+      code,
       stack: this.stack,
       ast: ast
     }
+  }
+
+  render(options: GeneratorOptions = defaultRenderOptions): {
+    code: string
+    stack: Record<string, string>[]
+    ast?: t.File
+  } {
+    if (!t.isFile(this.parser.ast)) {
+      return this.VueHelpers.generate()
+    }
+    const ast = this._transform()
+    const config = merge(defaultRenderOptions, options || {})
+    return this._generate(ast, config)
   }
 }
