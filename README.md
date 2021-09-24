@@ -82,6 +82,7 @@ const option = {
 }
 module.exports = {
   ...options,
+  ignore: [],
   prettier: (code, ast) => {
     if (ast) {
       return recast.print(ast, {
@@ -212,6 +213,22 @@ transformCode(source, {
     },
   },
 })
+```
+
+我们还可以像 `eslint` 一样，过滤掉一些不需要转换的文件或代码行。
+
+
+```javascript
+// code-i18n-disabled
+const country = '中国'
+const city = '重庆'
+// 上面所有中文都不会转换
+```
+
+```javascript
+const country = '中国'
+// code-i18n-disabled-next-line
+const city = '重庆' // 这行代码不会转换
 ```
 
 好了，说了这么多，下面就是 `parserOptions` 的默认值。

@@ -4,6 +4,7 @@ import { File } from '@babel/types'
 import { ESLintProgram } from 'vue-eslint-parser-private/ast'
 import { Linter } from 'eslint'
 import { merge } from 'lodash'
+import { IgoreFileCode, IgoreNextLineCode } from './constants'
 
 export type ParserType = 'js' | 'jsx' | 'ts' | 'tsx' | 'vue'
 
@@ -79,7 +80,7 @@ export default class Parser implements Props {
         .map((comment) => {
           return comment
         })
-        .find((item) => item.value.trim() === 'code-i18n-disabled')
+        .find((item) => item.value.trim() === IgoreFileCode)
       if (igore) {
         this.ignoreFile = {
           code: this.content,
@@ -87,7 +88,7 @@ export default class Parser implements Props {
         }
       }
       comments.forEach((comment) => {
-        this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === 'code-i18n-disabled-next-line'
+        this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === IgoreNextLineCode
       })
     }
   }

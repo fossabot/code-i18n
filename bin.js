@@ -50,7 +50,7 @@ var generate__default = /*#__PURE__*/_interopDefaultLegacy(generate);
 var traverse__default = /*#__PURE__*/_interopDefaultLegacy(traverse);
 var t__namespace = /*#__PURE__*/_interopNamespace(t);
 
-var version = "2.4.1";
+var version = "2.5.1";
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -125,6 +125,9 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 
+var IgoreFileCode = 'code-i18n-disabled';
+var IgoreNextLineCode = 'code-i18n-disabled-next-line';
+
 var Plugins = {
   js: [],
   vue: [],
@@ -181,7 +184,7 @@ var Parser = /*#__PURE__*/function () {
         var igore = comments.map(function (comment) {
           return comment;
         }).find(function (item) {
-          return item.value.trim() === 'code-i18n-disabled';
+          return item.value.trim() === IgoreFileCode;
         });
 
         if (igore) {
@@ -192,7 +195,7 @@ var Parser = /*#__PURE__*/function () {
         }
 
         comments.forEach(function (comment) {
-          _this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === 'code-i18n-disabled-next-line';
+          _this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === IgoreNextLineCode;
         });
       }
     }

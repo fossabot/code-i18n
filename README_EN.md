@@ -84,6 +84,7 @@ const option = {
 }
 module.exports = {
   ...options,
+  ignore: [],
   prettier: (code, ast) => {
     if (ast) {
       return recast.print(ast, {
@@ -211,6 +212,22 @@ transformCode(source, {
     },
   },
 })
+```
+
+We can also filter out some files or lines of code that do not need to be converted like `eslint`.
+
+
+```javascript
+// code-i18n-disabled
+const country ='中国'
+const city ='重庆'
+// All Chinese above will not be converted
+```
+
+```javascript
+const country ='中国'
+// code-i18n-disabled-next-line
+const city ='重庆' // This line of code will not be converted
 ```
 
 Well, having said so much, here are the default values of `parserOptions`.

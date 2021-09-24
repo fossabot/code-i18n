@@ -57,6 +57,9 @@ function _createClass(Constructor, protoProps, staticProps) {
   return Constructor;
 }
 
+var IgoreFileCode = 'code-i18n-disabled';
+var IgoreNextLineCode = 'code-i18n-disabled-next-line';
+
 var Plugins = {
   js: [],
   vue: [],
@@ -113,7 +116,7 @@ var Parser = /*#__PURE__*/function () {
         var igore = comments.map(function (comment) {
           return comment;
         }).find(function (item) {
-          return item.value.trim() === 'code-i18n-disabled';
+          return item.value.trim() === IgoreFileCode;
         });
 
         if (igore) {
@@ -124,7 +127,7 @@ var Parser = /*#__PURE__*/function () {
         }
 
         comments.forEach(function (comment) {
-          _this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === 'code-i18n-disabled-next-line';
+          _this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === IgoreNextLineCode;
         });
       }
     }
