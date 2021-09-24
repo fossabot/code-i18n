@@ -1,7 +1,7 @@
 import { Node, ESLintProgram, VText, VLiteral, ESLintLiteral } from 'vue-eslint-parser-private/ast/nodes'
 import { ESLintTemplateLiteral } from 'vue-eslint-parser-private/ast'
 import { traverseNodes, parse } from 'vue-eslint-parser-private'
-import { isContainChinese } from '../utils/index'
+import { isContainChinese, isIgoreLine } from '../utils/index'
 import { Options } from '../interface'
 import Parser from './parser'
 
@@ -92,6 +92,9 @@ export default class VueHelpers {
     if (!isContainChinese(ast.value as string)) {
       return
     }
+    if (!isIgoreLine(this.parser.ignoreLine, ast)) {
+      return
+    }
 
     const key = this._renderKey(ast)
 
@@ -147,7 +150,7 @@ export default class VueHelpers {
   }
 
   _traverseTemplateLiteral(ast: ESLintTemplateLiteral) {
-    if (ast.quasis.find((quasi) => isContainChinese(quasi.value.raw))) {
+    if (ast.quasis.find((quasi) => isContainChinese(quasi.value.raw)) && isIgoreLine(this.parser.ignoreLine, ast)) {
       const key = this._renderKey(ast)
       const content = this.content
 

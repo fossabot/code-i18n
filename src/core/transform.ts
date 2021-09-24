@@ -1,5 +1,5 @@
 import { cloneDeep, merge } from 'lodash'
-import { isContainChinese } from '../utils/index'
+import { isContainChinese, isIgoreLine } from '../utils/index'
 import generate, { GeneratorOptions } from '@babel/generator'
 import traverse from '@babel/traverse'
 import { Options } from '../interface'
@@ -10,7 +10,7 @@ import Parser from './parser'
 const defaultRenderOptions: GeneratorOptions = {
   retainLines: true,
   jsescOption: {
-    quotes: 'single'
+    quotes: 'single',
   },
 }
 
@@ -93,23 +93,30 @@ export default class Transform {
     const self = this
     traverse(ast, {
       StringLiteral(path) {
-        if (isContainChinese(path.node.value)) {
+        if (isContainChinese(path.node.value) && isIgoreLine(self.parser.ignoreLine, path.node)) {
           path.replaceWith(self._StringFunction(path.node))
         }
       },
       TemplateLiteral(path) {
-        if (path.node.quasis.find((quasi) => isContainChinese(quasi.value.raw))) {
+        if (
+          path.node.quasis.find((quasi) => isContainChinese(quasi.value.raw)) &&
+          isIgoreLine(self.parser.ignoreLine, path.node)
+        ) {
           path.replaceWith(self._TemplateFunction(path.node))
         }
       },
       JSXText(path) {
-        if (isContainChinese(path.node.value)) {
+        if (isContainChinese(path.node.value) && isIgoreLine(self.parser.ignoreLine, path.node)) {
           path.replaceWith(self._JSXTextFunction(path.node))
         }
       },
       JSXAttribute(path) {
         const { value } = path.node
-        if (t.isStringLiteral(value) && isContainChinese(value.value)) {
+        if (
+          t.isStringLiteral(value) &&
+          isContainChinese(value.value) &&
+          isIgoreLine(self.parser.ignoreLine, path.node)
+        ) {
           path.replaceWith(self._JSXAttributeFunction(path.node))
         }
       },
@@ -123,7 +130,7 @@ export default class Transform {
     return {
       code,
       stack: this.stack,
-      ast: ast
+      ast: ast,
     }
   }
 
@@ -132,6 +139,10 @@ export default class Transform {
     stack: Record<string, string>[]
     ast?: t.File
   } {
+    if (this.parser.ignoreFile) {
+      return this.parser.ignoreFile
+    }
+
     if (!t.isFile(this.parser.ast)) {
       return this.VueHelpers.generate()
     }

@@ -34,6 +34,12 @@ export default class Parser implements Props {
   readonly ast: File | ESLintProgram
   readonly parserOptions: Required<ParserOptions>
 
+  ignoreLine: Record<number, boolean>
+  ignoreFile?: {
+    code: string,
+    stack: Record<string, string>[]
+  }
+
   constructor(props: Props) {
     const DEFAULT_PARSER_OPTIONS: Required<ParserOptions> = {
       // https://github.com/eslint/espree#options
@@ -51,8 +57,10 @@ export default class Parser implements Props {
     this.parserOptions = merge(DEFAULT_PARSER_OPTIONS, props.parserOptions)
     this.content = props.content
     this.type = props.type
+    this.ignoreLine = {}
 
     this.ast = this._parser()
+    this._comment()
   }
 
   private _parser() {
@@ -62,5 +70,25 @@ export default class Parser implements Props {
     const options = this.parserOptions.babel
     options.plugins = (options.plugins || []).concat(Plugins[this.type])
     return parse(this.content, options)
+  }
+
+  private _comment() {
+    const { comments } = this.ast
+    if (comments && comments.length) {
+      const igore = comments
+        .map((comment) => {
+          return comment
+        })
+        .find((item) => item.value.trim() === 'code-i18n-disabled')
+      if (igore) {
+        this.ignoreFile = {
+          code: this.content,
+          stack: [],
+        }
+      }
+      comments.forEach((comment) => {
+        this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === 'code-i18n-disabled-next-line'
+      })
+    }
   }
 }

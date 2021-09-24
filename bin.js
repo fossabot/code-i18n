@@ -153,7 +153,10 @@ var Parser = /*#__PURE__*/function () {
     this.parserOptions = lodash.merge(DEFAULT_PARSER_OPTIONS, props.parserOptions);
     this.content = props.content;
     this.type = props.type;
+    this.ignoreLine = {};
     this.ast = this._parser();
+
+    this._comment();
   }
 
   _createClass(Parser, [{
@@ -167,6 +170,32 @@ var Parser = /*#__PURE__*/function () {
       options.plugins = (options.plugins || []).concat(Plugins[this.type]);
       return parser.parse(this.content, options);
     }
+  }, {
+    key: "_comment",
+    value: function _comment() {
+      var _this = this;
+
+      var comments = this.ast.comments;
+
+      if (comments && comments.length) {
+        var igore = comments.map(function (comment) {
+          return comment;
+        }).find(function (item) {
+          return item.value.trim() === 'code-i18n-disabled';
+        });
+
+        if (igore) {
+          this.ignoreFile = {
+            code: this.content,
+            stack: []
+          };
+        }
+
+        comments.forEach(function (comment) {
+          _this.ignoreLine[comment.loc.start.line + 1] = comment.value.trim() === 'code-i18n-disabled-next-line';
+        });
+      }
+    }
   }]);
 
   return Parser;
@@ -174,6 +203,13 @@ var Parser = /*#__PURE__*/function () {
 
 function isContainChinese(str) {
   return /[\u4e00-\u9fa5]/.test(str);
+}
+function isIgoreLine(igoreLine, node) {
+  if (node.loc && igoreLine[node.loc.start.line]) {
+    return false;
+  }
+
+  return true;
 }
 
 function _arrayWithHoles(arr) {
@@ -253,9 +289,9 @@ function _toConsumableArray(arr) {
   return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray$1(arr) || _nonIterableSpread();
 }
 
-function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -317,7 +353,7 @@ var VueHelpers = /*#__PURE__*/function () {
             if (k1.range[0] > k.range[1]) {
               var diff = k.length - (k.sourceLength || k.source.length);
               var range = [k1.range[0] + diff, k1.range[1] + diff];
-              map[i][0] = _objectSpread$2(_objectSpread$2({}, map[i][0]), {}, {
+              map[i][0] = _objectSpread$1(_objectSpread$1({}, map[i][0]), {}, {
                 range: range
               });
             }
@@ -327,7 +363,7 @@ var VueHelpers = /*#__PURE__*/function () {
               var _diff = code.indexOf(k1.source);
 
               var _range = [_diff, _diff + k1.source.length];
-              map[i][0] = _objectSpread$2(_objectSpread$2({}, map[i][0]), {}, {
+              map[i][0] = _objectSpread$1(_objectSpread$1({}, map[i][0]), {}, {
                 range: _range
               });
             }
@@ -354,6 +390,10 @@ var VueHelpers = /*#__PURE__*/function () {
     key: "_traverseTemplateBody",
     value: function _traverseTemplateBody(ast) {
       if (!isContainChinese(ast.value)) {
+        return;
+      }
+
+      if (!isIgoreLine(this.parser.ignoreLine, ast)) {
         return;
       }
 
@@ -410,7 +450,7 @@ var VueHelpers = /*#__PURE__*/function () {
     value: function _traverseTemplateLiteral(ast) {
       if (ast.quasis.find(function (quasi) {
         return isContainChinese(quasi.value.raw);
-      })) {
+      }) && isIgoreLine(this.parser.ignoreLine, ast)) {
         var key = this._renderKey(ast);
 
         var content = this.content;
@@ -477,9 +517,6 @@ var VueHelpers = /*#__PURE__*/function () {
   return VueHelpers;
 }();
 
-function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 var defaultRenderOptions = {
   retainLines: true,
   jsescOption: {
@@ -560,26 +597,26 @@ var Transform = /*#__PURE__*/function () {
       var self = this;
       traverse__default['default'](ast, {
         StringLiteral: function StringLiteral(path) {
-          if (isContainChinese(path.node.value)) {
+          if (isContainChinese(path.node.value) && isIgoreLine(self.parser.ignoreLine, path.node)) {
             path.replaceWith(self._StringFunction(path.node));
           }
         },
         TemplateLiteral: function TemplateLiteral(path) {
           if (path.node.quasis.find(function (quasi) {
             return isContainChinese(quasi.value.raw);
-          })) {
+          }) && isIgoreLine(self.parser.ignoreLine, path.node)) {
             path.replaceWith(self._TemplateFunction(path.node));
           }
         },
         JSXText: function JSXText(path) {
-          if (isContainChinese(path.node.value)) {
+          if (isContainChinese(path.node.value) && isIgoreLine(self.parser.ignoreLine, path.node)) {
             path.replaceWith(self._JSXTextFunction(path.node));
           }
         },
         JSXAttribute: function JSXAttribute(path) {
           var value = path.node.value;
 
-          if (t__namespace.isStringLiteral(value) && isContainChinese(value.value)) {
+          if (t__namespace.isStringLiteral(value) && isContainChinese(value.value) && isIgoreLine(self.parser.ignoreLine, path.node)) {
             path.replaceWith(self._JSXAttributeFunction(path.node));
           }
         }
@@ -587,27 +624,34 @@ var Transform = /*#__PURE__*/function () {
       return ast;
     }
   }, {
-    key: "transform",
-    value: function transform() {
-      if (t__namespace.isFile(this.parser.ast)) {
-        return this._transform();
-      }
+    key: "_generate",
+    value: function _generate(ast, options) {
+      var _generate2 = generate__default['default'](ast, options, this.parser.content),
+          code = _generate2.code;
+
+      return {
+        code: code,
+        stack: this.stack,
+        ast: ast
+      };
     }
   }, {
     key: "render",
     value: function render() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultRenderOptions;
-      var ast = this.transform();
+
+      if (this.parser.ignoreFile) {
+        return this.parser.ignoreFile;
+      }
 
       if (!t__namespace.isFile(this.parser.ast)) {
         return this.VueHelpers.generate();
       }
 
+      var ast = this._transform();
+
       var config = lodash.merge(defaultRenderOptions, options || {});
-      return _objectSpread$1(_objectSpread$1({}, generate__default['default'](ast, config, this.parser.content)), {}, {
-        stack: this.stack,
-        ast: ast
-      });
+      return this._generate(ast, config);
     }
   }]);
 
@@ -803,10 +847,11 @@ function transformDirectory(dir, config) {
   var dirpath = path__default['default'].resolve(root, dir);
   return new Promise(function (resolve, reject) {
     glob__default['default']("**/*.".concat(config.type), {
-      cwd: dirpath
+      cwd: dirpath,
+      ignore: config.ignore
     }, function (err, matches) {
       if (err) {
-        console.log(err);
+        reject(err);
       } else {
         var paths = matches.map(function (item) {
           return path__default['default'].join(dirpath, item);

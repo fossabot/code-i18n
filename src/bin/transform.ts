@@ -18,6 +18,7 @@ interface FormatOutput extends ReturnType<typeof transformCode> {
 
 type Command = Partial<CommandArgs> & { write: boolean | string } & Partial<{
     prettier: (node: string, ast?: t.File) => string
+    ignore: string[] | string
   }>
 
 enum LanguageAction {
@@ -152,10 +153,11 @@ export function transformDirectory(dir: string, config: Partial<Config> & Comman
       `**/*.${config.type}`,
       {
         cwd: dirpath,
+        ignore: config.ignore
       },
       (err, matches) => {
         if (err) {
-          console.log(err)
+          reject(err)
         } else {
           const paths = matches.map((item) => path.join(dirpath, item))
 
