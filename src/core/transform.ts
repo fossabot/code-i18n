@@ -33,15 +33,16 @@ export default class Transform {
     this.VueHelpers = new VueHelpers(parser, options)
   }
 
-  _key(node: t.Node) {
+  _key(node: t.Node, value: string) {
     const loc = node.loc as t.SourceLocation
+    
     return this.options?.ruleKey
-      ? this.options.ruleKey(node, this.options.path)
+      ? this.options.ruleKey(node, this.options.path, value)
       : `${node.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
   }
 
   _StringFunction(node: t.StringLiteral) {
-    const key = String(this._key(node))
+    const key = String(this._key(node, node.value))
     this.stack.push({
       [key]: node.value,
     })
@@ -49,7 +50,6 @@ export default class Transform {
   }
 
   _TemplateFunction(node: t.TemplateLiteral) {
-    const key = String(this._key(node))
     const args: t.Expression[] = []
 
     let index = 0
@@ -60,6 +60,7 @@ export default class Transform {
         return `{${index++}}`
       }
     })
+    const key = String(this._key(node, value.join('')))
     this.stack.push({
       [key]: value.join(''),
     })
@@ -72,7 +73,7 @@ export default class Transform {
   }
 
   _JSXTextFunction(node: t.JSXText) {
-    const key = String(this._key(node))
+    const key = String(this._key(node, node.value))
     this.stack.push({
       [key]: node.value,
     })
@@ -80,12 +81,13 @@ export default class Transform {
   }
 
   _JSXAttributeFunction(node: t.JSXAttribute) {
-    const key = String(this._key(node))
+    const value = (node.value as t.StringLiteral).value
+    const key = String(this._key(node, value))
     this.stack.push({
-      [key]: (node.value as t.StringLiteral).value,
+      [key]: value,
     })
-    const value = t.jSXExpressionContainer(t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key)]))
-    return t.jSXAttribute(node.name, value)
+    const valueNode = t.jSXExpressionContainer(t.callExpression(t.identifier(this.identifier), [t.stringLiteral(key)]))
+    return t.jSXAttribute(node.name, valueNode)
   }
 
   _transform() {

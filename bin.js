@@ -320,11 +320,11 @@ var VueHelpers = /*#__PURE__*/function () {
 
   _createClass(VueHelpers, [{
     key: "_renderKey",
-    value: function _renderKey(ast) {
+    value: function _renderKey(ast, value) {
       var _this$options2;
 
       var loc = ast.loc;
-      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(ast, this.options.path) : "".concat(ast.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
+      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(ast, this.options.path, value) : "".concat(ast.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
     }
   }, {
     key: "_generate",
@@ -400,7 +400,7 @@ var VueHelpers = /*#__PURE__*/function () {
         return;
       }
 
-      var key = this._renderKey(ast);
+      var key = this._renderKey(ast, ast.value);
 
       if (ast.type === 'VText') {
         var v = "{{".concat(this.identifier, "('").concat(key, "')}}"); // fixed html Escape
@@ -454,8 +454,6 @@ var VueHelpers = /*#__PURE__*/function () {
       if (ast.quasis.find(function (quasi) {
         return isContainChinese(quasi.value.raw);
       }) && isIgoreLine(this.parser.ignoreLine, ast)) {
-        var key = this._renderKey(ast);
-
         var content = this.content;
         var source = content.slice(ast.start, ast.end);
         var args = ast.expressions.map(function (expression) {
@@ -469,6 +467,9 @@ var VueHelpers = /*#__PURE__*/function () {
           }).join('').slice(2), ".{0,}\\}"));
           language = language.replace(regexp, "{".concat(i++, "}"));
         });
+
+        var key = this._renderKey(ast, language);
+
         var v = "".concat(this.identifier, "('").concat(key, "'").concat(args.length ? ',' : '', " ").concat(args.join(', '), ")");
         this.map.set({
           type: 'TemplateLiteral',
@@ -544,23 +545,22 @@ var Transform = /*#__PURE__*/function () {
 
   _createClass(Transform, [{
     key: "_key",
-    value: function _key(node) {
+    value: function _key(node, value) {
       var _this$options2;
 
       var loc = node.loc;
-      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node, this.options.path) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
+      return (_this$options2 = this.options) !== null && _this$options2 !== void 0 && _this$options2.ruleKey ? this.options.ruleKey(node, this.options.path, value) : "".concat(node.type, "_").concat(loc.start.line, "_").concat(loc.start.column, "_").concat(loc.end.line, "_").concat(loc.end.column);
     }
   }, {
     key: "_StringFunction",
     value: function _StringFunction(node) {
-      var key = String(this._key(node));
+      var key = String(this._key(node, node.value));
       this.stack.push(_defineProperty({}, key, node.value));
       return t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]);
     }
   }, {
     key: "_TemplateFunction",
     value: function _TemplateFunction(node) {
-      var key = String(this._key(node));
       var args = [];
       var index = 0;
       var value = node.quasis.map(function (quasis) {
@@ -570,6 +570,7 @@ var Transform = /*#__PURE__*/function () {
           return "{".concat(index++, "}");
         }
       });
+      var key = String(this._key(node, value.join('')));
       this.stack.push(_defineProperty({}, key, value.join('')));
       node.expressions.map(function (expression) {
         if (!t__namespace.isTSType(expression)) {
@@ -581,17 +582,18 @@ var Transform = /*#__PURE__*/function () {
   }, {
     key: "_JSXTextFunction",
     value: function _JSXTextFunction(node) {
-      var key = String(this._key(node));
+      var key = String(this._key(node, node.value));
       this.stack.push(_defineProperty({}, key, node.value));
       return t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]));
     }
   }, {
     key: "_JSXAttributeFunction",
     value: function _JSXAttributeFunction(node) {
-      var key = String(this._key(node));
-      this.stack.push(_defineProperty({}, key, node.value.value));
-      var value = t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]));
-      return t__namespace.jSXAttribute(node.name, value);
+      var value = node.value.value;
+      var key = String(this._key(node, value));
+      this.stack.push(_defineProperty({}, key, value));
+      var valueNode = t__namespace.jSXExpressionContainer(t__namespace.callExpression(t__namespace.identifier(this.identifier), [t__namespace.stringLiteral(key)]));
+      return t__namespace.jSXAttribute(node.name, valueNode);
     }
   }, {
     key: "_transform",

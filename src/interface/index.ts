@@ -9,7 +9,7 @@ export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType exten
 
 export interface Options {
   readonly identifier?: string
-  ruleKey?: (node: t.Node | Node, path?: string) => string | number
+  ruleKey?: (node: t.Node | Node, path?: string, value?: string) => string | number
   parserOptions?: ParserOptions
   path?: string
   generatorOptions?: GeneratorOptions

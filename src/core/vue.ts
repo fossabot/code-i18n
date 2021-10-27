@@ -33,10 +33,10 @@ export default class VueHelpers {
     this.identifier = this.options?.identifier || this.identifier
   }
 
-  _renderKey(ast: Node) {
+  _renderKey(ast: Node, value: string) {
     const loc = ast.loc
     return this.options?.ruleKey
-      ? this.options.ruleKey(ast, this.options.path)
+      ? this.options.ruleKey(ast, this.options.path, value)
       : `${ast.type}_${loc.start.line}_${loc.start.column}_${loc.end.line}_${loc.end.column}`
   }
 
@@ -96,7 +96,7 @@ export default class VueHelpers {
       return
     }
 
-    const key = this._renderKey(ast)
+    const key = this._renderKey(ast, ast.value as string)
 
     if (ast.type === 'VText') {
       const v = `{{${this.identifier}('${key}')}}`
@@ -151,7 +151,6 @@ export default class VueHelpers {
 
   _traverseTemplateLiteral(ast: ESLintTemplateLiteral) {
     if (ast.quasis.find((quasi) => isContainChinese(quasi.value.raw)) && isIgoreLine(this.parser.ignoreLine, ast)) {
-      const key = this._renderKey(ast)
       const content = this.content
 
       const source = content.slice(ast.start, ast.end)
@@ -173,6 +172,7 @@ export default class VueHelpers {
         language = language.replace(regexp, `{${i++}}`)
       })
 
+      const key = this._renderKey(ast, language)
       const v = `${this.identifier}('${key}'${args.length ? ',' : ''} ${args.join(', ')})`
       this.map.set(
         {

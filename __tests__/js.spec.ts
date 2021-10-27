@@ -1,5 +1,6 @@
 import Parser from '../src/core/parser'
 import Transform from '../src/core/transform'
+import Pinyin from 'pinyin'
 import { print } from 'recast'
 import { Options } from '../src/interface/index'
 
@@ -110,5 +111,17 @@ describe('JS', () => {
   version() {},
   author: i18n(\"StringLiteral_3_14_3_18\")
 };`)
+  })
+
+  test('Transform key [Generator]', () => {
+    const source = 'const country = "中国"'
+    const { code } = codeI18n(source, {
+      ruleKey: (node, path, value) => {
+        return Pinyin(value, {
+          style: Pinyin.STYLE_NORMAL
+        }).join('')
+      },
+    })
+    expect(code).toBe(`const country = $t('zhongguo');`)
   })
 })
