@@ -3,6 +3,7 @@ import Transform from '../src/core/transform'
 import Pinyin from 'pinyin'
 import { print } from 'recast'
 import { Options } from '../src/interface/index'
+import { File } from '@babel/types'
 
 function codeI18n(source: string, config?: Options) {
   const parser = new Parser({
@@ -56,8 +57,8 @@ describe('JS', () => {
     \``
     const { code } = codeI18n(source, {
       generatorOptions: {
-        retainLines: false
-      }
+        retainLines: false,
+      },
     })
     expect(code).toBe(`const language = $t('TemplateLiteral_1_17_4_5', c || $t('StringLiteral_2_11_2_15'), b, null);`)
   })
@@ -96,29 +97,12 @@ describe('JS', () => {
 };`)
   })
 
-  test('Transform [Options identifier]', () => {
-    const source = `const babel = {
-      version() {},
-      author: '中国'
-    }`
-    const { ast } = codeI18n(source, {
-      identifier: 'i18n',
-    })
-    const code = print(ast, {
-      tabWidth: 2
-    }).code
-    expect(code).toBe(`const babel = {
-  version() {},
-  author: i18n(\"StringLiteral_3_14_3_18\")
-};`)
-  })
-
   test('Transform key [Generator]', () => {
     const source = 'const country = "中国"'
     const { code } = codeI18n(source, {
       ruleKey: (node, path, value) => {
-        return Pinyin(value, {
-          style: Pinyin.STYLE_NORMAL
+        return Pinyin(value as string, {
+          style: Pinyin.STYLE_NORMAL,
         }).join('')
       },
     })
