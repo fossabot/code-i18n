@@ -1,6 +1,6 @@
 {
   "name": "code-i18n",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Intrusive language conversion script",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -34,6 +34,7 @@
     "@babel/runtime": "^7.14.7",
     "@babel/traverse": "^7.14.7",
     "@babel/types": "^7.14.5",
+    "@typescript-eslint/parser": "^4.29.1",
     "chalk": "^4.1.1",
     "commander": "^8.0.0",
     "glob": "^7.1.7",
@@ -41,7 +42,8 @@
     "lodash": "^4.17.21",
     "ora": "^5.4.1",
     "prettier": "^2.3.2",
-    "vue-eslint-parser-private": "7.9.0-private"
+    "vue-eslint-parser-private": "7.9.0-private",
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",
@@ -61,7 +63,6 @@
     "@types/pinyin": "^2.10.0",
     "@types/request": "^2.48.5",
     "@types/uuid": "^8.3.1",
-    "@typescript-eslint/parser": "^4.29.1",
     "eslint": "^8.4.1",
     "jest": "^27.0.6",
     "pinyin": "^2.10.2",
@@ -76,7 +77,6 @@
     "rollup-plugin-polyfill-node": "^0.6.2",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.5.4"
+    "tslib": "^2.3.1"
   }
 }
