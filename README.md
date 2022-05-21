@@ -15,6 +15,7 @@
 `code-i18n` 开箱即用的项目国际化工具。  
 访问[https://vite-i18n.netlify.app/](https://vite-i18n.netlify.app/)可以在项目中快速使用 `code-i18n`。
 [![Netlify Status](https://api.netlify.com/api/v1/badges/644b446a-84ff-45cd-8267-c6b501b04114/deploy-status)](https://app.netlify.com/sites/code-i18n/deploys)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLinkontoask%2Fcode-i18n.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FLinkontoask%2Fcode-i18n?ref=badge_shield)
 
 ## Type
 
@@ -334,3 +335,7 @@ glob(
 | vue.ts       | 100     | 89.29    | 100     | 100     | 38,147,170        |
 | utils        | 100     | 100      | 100     | 100     |
 | index.ts     | 100     | 100      | 100     | 100     |
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLinkontoask%2Fcode-i18n.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FLinkontoask%2Fcode-i18n?ref=badge_large)
